@@ -22,7 +22,7 @@ export async function PUT(request, context) {
   try {
     const { id } = await context.params;
     const body = await request.json();
-    const { createdby, status } = body;
+    const { createdby, status, liberar } = body;
     console.log("Folio:", id);
     console.log("createdby:", createdby);
 
@@ -47,19 +47,39 @@ export async function PUT(request, context) {
     // Verificar y actualizar según coincidencia
     if (folio.responsable1 === createdby) {
       [result] = await conn.query(
-        "UPDATE folios SET status_1='" + [status] + "' WHERE folio_id = ?",
+        "UPDATE folios SET status_1='" +
+          [status] +
+          "', status_S='NA' WHERE folio_id = ?",
         [id]
       );
     }
     if (folio.suplente === createdby) {
       [result] = await conn.query(
-        "UPDATE folios SET status_S='" + [status] + "' WHERE folio_id = ?",
+        "UPDATE folios SET status_S='" +
+          [status] +
+          "',status_1='NA' WHERE folio_id = ?",
+        [id]
+      );
+    }
+    if (folio.responsable1 === createdby && folio.suplente === createdby) {
+      [result] = await conn.query(
+        "UPDATE folios SET status_1='" +
+          [status] +
+          "', status_S='" +
+          [status] +
+          "' WHERE folio_id = ?",
         [id]
       );
     }
     if (folio.responsable2 === createdby) {
       [result] = await conn.query(
         "UPDATE folios SET status_2='" + [status] + "' WHERE folio_id = ?",
+        [id]
+      );
+    }
+    if (liberar === "true") {
+      [result] = await conn.query(
+        "UPDATE folios SET liberado='" + [liberar] + "' WHERE folio_id = ?",
         [id]
       );
     }

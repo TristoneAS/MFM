@@ -26,12 +26,13 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
-
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import React, { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { DataContext } from "@/contexts/dataContext";
 
 export default function NavBar() {
+  const [admin, setAdmin] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
   const { name, setName } = useContext(DataContext);
@@ -72,8 +73,15 @@ export default function NavBar() {
       try {
         const parsedUserInfo = JSON.parse(userInfo);
         const users = parsedUserInfo.data?.users;
-        console.log(users);
-
+        const roles = parsedUserInfo.roles;
+        for (let eachrol of roles) {
+          if (eachrol.includes("Admin")) {
+            setAdmin(true);
+            break;
+          }
+        }
+        console.log("los reoles son:", parsedUserInfo.roles);
+        ///////////******************************************************************************************************************************************* */
         if (users && users.length > 0) {
           const cn = users[0].cn;
           setName(cn);
@@ -95,7 +103,7 @@ export default function NavBar() {
     "Nuevo Folio": <AddCircleIcon />,
     Aprobaciones: <CheckCircleIcon />,
     Entradas_Salidas: <SwapHorizIcon />,
-    "Salidas temporales": <DirectionsWalkIcon />,
+    "Ver todos": <VisibilityIcon />,
     Configuracion: <SettingsIcon />,
   };
 
@@ -125,20 +133,22 @@ export default function NavBar() {
         )}
       </List>
       <Divider />
-      <List>
-        {["Salidas temporales", "Configuracion"].map((text) => (
-          <ListItem
-            key={text}
-            disablePadding
-            onClick={() => handleClickNavegar(text)}
-          >
-            <ListItemButton>
-              <ListItemIcon>{iconMap[text]}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      {admin && (
+        <List>
+          {["Configuracion", "Ver todos"].map((text) => (
+            <ListItem
+              key={text}
+              disablePadding
+              onClick={() => handleClickNavegar(text)}
+            >
+              <ListItemButton>
+                <ListItemIcon>{iconMap[text]}</ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        </List>
+      )}
     </Box>
   );
 

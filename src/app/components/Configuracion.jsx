@@ -15,7 +15,13 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import EditIcon from "@mui/icons-material/Edit";
-import { Select, MenuItem } from "@mui/material";
+import {
+  Select,
+  MenuItem,
+  Stack,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -112,7 +118,7 @@ function Configuracion() {
         }
       }
 
-      const newRow = { id: inicio, costcenter: "", cost_center_name: "" };
+      const newRow = { id: inicio, cost_center: "", cost_center_name: "" };
       setRowsCostCenter((prev) => [newRow, ...prev]);
       setCostCenter({ id: "", cost_center: "", cost_center_name });
       setTimeout(() => {
@@ -504,6 +510,8 @@ function Configuracion() {
     }
   };
   const handleClickRowEnvio = async (params) => {
+    console.log("los params es: " + params.row.modo_envio);
+
     setEnvio({
       modo_envio: params.row.modo_envio,
     });
@@ -590,7 +598,7 @@ function Configuracion() {
         }
       }
 
-      const newRowIncoterm = { id: inicio, Incoterm: "" };
+      const newRowIncoterm = { id: inicio, incoterm: "" };
       setRowsIncoterm((prevIncoterm) => [newRowIncoterm, ...prevIncoterm]);
       setIncoterm({ id: "", incoterm: "" });
       setTimeout(() => {
@@ -619,7 +627,9 @@ function Configuracion() {
 
   const handleClickGuardarIncoterm = async () => {
     try {
-      if (incoterm.incoterm.trim() === "") {
+      console.log("el inco es: ", incoterm);
+
+      if (incoterm?.incoterm === "" || incoterm?.incoterm === null) {
         Advertencia();
       } else {
         const buscar = await axios.get(
@@ -659,6 +669,8 @@ function Configuracion() {
     }
   };
   const handleClickRowIncoterm = async (params) => {
+    console.log("los params envio es: " + params.row.incoterm);
+
     setIncoterm({
       incoterm: params.row.incoterm,
     });
@@ -747,7 +759,7 @@ function Configuracion() {
         }
       }
 
-      const newRowRazon = { id: inicio, Razon: "" };
+      const newRowRazon = { id: inicio, razon: "" };
       setRowsRazon((prevRazon) => [newRowRazon, ...prevRazon]);
       setRazon({ id: "", razon: "" });
       setTimeout(() => {
@@ -930,21 +942,25 @@ function Configuracion() {
 
   const handleClickGuardarUnidad_medida = async () => {
     try {
-      const buscar = await axios.get(
-        `/api/unidad_medida/?id=${idSelectedunidad_medida}`
-      );
-      if (buscar.data.length > 0) {
-        await axios.put(
-          `/api/unidad_medida/${idSelectedunidad_medida}`,
-          unidad_medida
-        );
+      if (unidad_medida.unidad_medida.trim() === "") {
+        Advertencia();
       } else {
-        await axios.post("/api/unidad_medida/", unidad_medida);
-        const res2 = await axios.get("/api/unidad_medida/");
-        setRowsUnidad_medida(res2.data);
-        setBtnAddUnidad_medida(false);
-        setBtnDeleteUnidad_medida(true);
-        setBtnSaveUnidad_medida(true);
+        const buscar = await axios.get(
+          `/api/unidad_medida/?id=${idSelectedunidad_medida}`
+        );
+        if (buscar.data.length > 0) {
+          await axios.put(
+            `/api/unidad_medida/${idSelectedunidad_medida}`,
+            unidad_medida
+          );
+        } else {
+          await axios.post("/api/unidad_medida/", unidad_medida);
+          const res2 = await axios.get("/api/unidad_medida/");
+          setRowsUnidad_medida(res2.data);
+          setBtnAddUnidad_medida(false);
+          setBtnDeleteUnidad_medida(true);
+          setBtnSaveUnidad_medida(true);
+        }
       }
     } catch (error) {
       console.error("Error:", error);
@@ -1114,18 +1130,28 @@ function Configuracion() {
     console.log("la locacion es: ", locacion);
 
     try {
-      const buscar = await axios.get(`/api/locacion/?id=${idSelectedLocacion}`);
-      if (buscar.data.length > 0) {
-        await axios.put(`/api/locacion/${idSelectedLocacion}`, locacion);
+      if (
+        locacion.locacion.trim() === "" ||
+        locacion.direccion.trim() === "" ||
+        locacion.documento === ""
+      ) {
+        Advertencia();
       } else {
-        await axios.post("/api/locacion/", locacion);
-        const res2 = await axios.get("/api/locacion/");
-        setRowsLocacion(res2.data);
-        setBtnAddLocacion(false);
-        setBtnDeleteLocacion(true);
-        setBtnSaveLocacion(true);
+        const buscar = await axios.get(
+          `/api/locacion/?id=${idSelectedLocacion}`
+        );
+        if (buscar.data.length > 0) {
+          await axios.put(`/api/locacion/${idSelectedLocacion}`, locacion);
+        } else {
+          await axios.post("/api/locacion/", locacion);
+          const res2 = await axios.get("/api/locacion/");
+          setRowsLocacion(res2.data);
+          setBtnAddLocacion(false);
+          setBtnDeleteLocacion(true);
+          setBtnSaveLocacion(true);
+        }
+        setOpenModalLocacion(false);
       }
-      setOpenModalLocacion(false);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -1723,105 +1749,83 @@ function Configuracion() {
             fontSize: "20px",
           }}
         >
-          <Box sx={style}>
-            <h1
-              style={{
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
+          <Box sx={{ ...style, padding: 4, borderRadius: 2 }}>
+            <Typography variant="h4" align="center" gutterBottom>
               Tipo de Material
-            </h1>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                height: "400px",
-                padding: "1rem",
-                gap: "1rem",
-              }}
-            >
+            </Typography>
+
+            <Stack spacing={3} alignItems="center" sx={{ mt: 2 }}>
               <TextField
+                fullWidth
                 name="tipo_material"
-                id="outlined-basic1"
-                type="text"
+                id="tipo-material"
+                label="Tipo de Material"
                 variant="outlined"
                 size="small"
                 onChange={handleChangeSetInfo}
-                sx={{ width: "100%", maxWidth: "400px" }}
+                sx={{ maxWidth: 400 }}
               />
-              <label style={{ fontSize: "20px", marginTop: "0.5rem" }}>
-                Responsable 1
-              </label>
-              <Select
-                name="responsable1"
-                labelId="respons-label"
-                id="respons-select"
-                value={material.responsable1}
-                onChange={handleChangeSetInfo}
-                variant="standard"
-                sx={{ width: "100%", maxWidth: "400px" }}
-              >
-                {respons.map((respons) => (
-                  <MenuItem key={respons.emp_id} value={respons.emp_id}>
-                    {respons.emp_nombre}
-                  </MenuItem>
-                ))}
-              </Select>
-              <label style={{ fontSize: "20px", marginTop: "0.5rem" }}>
-                Suplente
-              </label>
-              <Select
-                name="suplente"
-                labelId="respons-label"
-                id="respons-select"
-                value={material.suplente}
-                onChange={handleChangeSetInfo}
-                variant="standard"
-                sx={{ width: "100%", maxWidth: "400px" }}
-              >
-                {respons.map((respons) => (
-                  <MenuItem key={respons.emp_id} value={respons.emp_id}>
-                    {respons.emp_nombre}
-                  </MenuItem>
-                ))}
-              </Select>
-              <label style={{ fontSize: "20px", marginTop: "0.5rem" }}>
-                Responsable 2
-              </label>
-              <Select
-                name="responsable2"
-                labelId="respons2-label"
-                id="respons2-select"
-                value={material.responsable2}
-                onChange={handleChangeSetInfo}
-                variant="standard"
-                sx={{ width: "100%", maxWidth: "400px" }}
-              >
-                {respons.map((respons) => (
-                  <MenuItem key={respons.id} value={respons.emp_id}>
-                    {respons.emp_nombre}
-                  </MenuItem>
-                ))}
-              </Select>
+
+              <FormControl fullWidth sx={{ maxWidth: 400 }}>
+                <InputLabel id="responsable1-label">Responsable 1</InputLabel>
+                <Select
+                  labelId="responsable1-label"
+                  id="responsable1-select"
+                  name="responsable1"
+                  value={material.responsable1}
+                  onChange={handleChangeSetInfo}
+                >
+                  {respons.map((r) => (
+                    <MenuItem key={r.emp_id} value={r.emp_id}>
+                      {r.emp_nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth sx={{ maxWidth: 400 }}>
+                <InputLabel id="suplente-label">Suplente</InputLabel>
+                <Select
+                  labelId="suplente-label"
+                  id="suplente-select"
+                  name="suplente"
+                  value={material.suplente}
+                  onChange={handleChangeSetInfo}
+                >
+                  {respons.map((r) => (
+                    <MenuItem key={r.emp_id} value={r.emp_id}>
+                      {r.emp_nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth sx={{ maxWidth: 400 }}>
+                <InputLabel id="responsable2-label">Responsable 2</InputLabel>
+                <Select
+                  labelId="responsable2-label"
+                  id="responsable2-select"
+                  name="responsable2"
+                  value={material.responsable2}
+                  onChange={handleChangeSetInfo}
+                >
+                  {respons.map((r) => (
+                    <MenuItem key={r.emp_id} value={r.emp_id}>
+                      {r.emp_nombre}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
               <Button
-                size="large"
                 variant="contained"
-                disableElevation
-                onClick={() => handleClickGuardarTipo_material()}
-                sx={{
-                  width: "100%",
-                  maxWidth: "400px",
-                  marginTop: "1rem",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
+                size="large"
+                onClick={handleClickGuardarTipo_material}
+                sx={{ maxWidth: 400 }}
               >
                 Confirmar
               </Button>
-            </div>
+            </Stack>
           </Box>
         </Box>
       </Modal>
@@ -1970,82 +1974,62 @@ function Configuracion() {
             fontSize: "20px",
           }}
         >
-          <Box sx={style}>
-            <h1
-              style={{
-                display: "flex",
-                justifyContent: "center",
-              }}
-            >
-              Locacion
-            </h1>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                height: "400px",
-                padding: "1rem",
-                gap: "1rem",
-              }}
-            >
+          <Box sx={{ ...style, padding: 4, borderRadius: 2 }}>
+            <Typography variant="h4" align="center" gutterBottom>
+              Locación
+            </Typography>
+
+            <Stack spacing={3} alignItems="center" sx={{ mt: 2 }}>
               <TextField
+                fullWidth
+                maxRows={1}
                 name="locacion"
                 id="locacion"
-                type="text"
+                label="Locación"
                 variant="outlined"
                 size="small"
-                label="Locacion"
                 onChange={handleChangeSetInfoLocacion}
-                sx={{ width: "100%", maxWidth: "400px" }}
+                sx={{ maxWidth: 400 }}
               />
+
               <TextField
+                fullWidth
                 name="direccion"
                 id="direccion"
-                type="text"
+                label="Dirección"
                 variant="outlined"
                 size="small"
-                label="Direccion"
                 onChange={handleChangeSetInfoLocacion}
-                sx={{ width: "100%", maxWidth: "400px" }}
+                sx={{ maxWidth: 400 }}
               />
-              <label style={{ fontSize: "20px", marginTop: "0.5rem" }}>
-                Titulo documento{" "}
-              </label>
-              <Select
-                name="documento"
-                labelId="respons-label"
-                id="respons-select"
-                value={locacion.documento}
-                onChange={handleChangeSetInfoLocacion}
-                variant="standard"
-                sx={{ width: "100%", maxWidth: "400px" }}
-              >
-                <MenuItem value="FORMATO SALIDA DE MATERIAL">
-                  FORMATO SALIDA DE MATERIAL
-                </MenuItem>
-                <MenuItem value="COMMERCIAL INVOICE/PRO FORMA">
-                  COMMERCIAL INVOICE/PRO FORMA
-                </MenuItem>
-              </Select>
+
+              <FormControl fullWidth sx={{ maxWidth: 400 }}>
+                <InputLabel id="documento-label">Título documento</InputLabel>
+                <Select
+                  labelId="documento-label"
+                  id="documento-select"
+                  name="documento"
+                  value={locacion.documento}
+                  onChange={handleChangeSetInfoLocacion}
+                >
+                  <MenuItem value="FORMATO SALIDA DE MATERIAL">
+                    FORMATO SALIDA DE MATERIAL
+                  </MenuItem>
+                  <MenuItem value="COMMERCIAL INVOICE/PRO FORMA">
+                    COMMERCIAL INVOICE/PRO FORMA
+                  </MenuItem>
+                </Select>
+              </FormControl>
 
               <Button
-                size="large"
                 variant="contained"
-                disableElevation
-                onClick={() => handleClickGuardarLocacion()}
-                sx={{
-                  width: "100%",
-                  maxWidth: "400px",
-                  marginTop: "1rem",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
+                size="large"
+                onClick={handleClickGuardarLocacion}
+                sx={{ maxWidth: 400 }}
               >
                 Confirmar
               </Button>
-            </div>
+            </Stack>
           </Box>
         </Box>
       </Modal>

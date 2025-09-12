@@ -753,6 +753,7 @@ function NuevoFolio() {
     total_pallets_cajas: "",
     total_peso: "",
     total_valor: "",
+    liberado: "false",
   });
   useEffect(() => {
     let origen_location = folio.origen_location !== "" ? 6 : 0;

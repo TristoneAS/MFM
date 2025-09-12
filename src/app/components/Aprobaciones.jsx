@@ -1,21 +1,24 @@
 "use client";
 import * as React from "react";
-import CloseIcon from "@mui/icons-material/Close";
-
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import CheckIcon from "@mui/icons-material/Check";
-import Box from "@mui/material/Box";
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 import { DataGrid } from "@mui/x-data-grid";
-import { Button } from "@mui/material";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
+import { Button, Box, Tabs, Tab } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+
+import HourglassBottomTwoToneIcon from "@mui/icons-material/HourglassBottomTwoTone";
+import CancelTwoToneIcon from "@mui/icons-material/CancelTwoTone";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import BrowserNotSupportedIcon from "@mui/icons-material/BrowserNotSupported";
+
 import Visualizar from "./Visualizar";
+
+// ---------------- Custom Tab Panel ----------------
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
-
   return (
     <div
       role="tabpanel"
@@ -28,6 +31,7 @@ function CustomTabPanel(props) {
     </div>
   );
 }
+
 CustomTabPanel.propTypes = {
   children: PropTypes.node,
   index: PropTypes.number.isRequired,
@@ -40,96 +44,143 @@ function a11yProps(index) {
     "aria-controls": `simple-tabpanel-${index}`,
   };
 }
-function Aprobaciones() {
-  //********************************* */
+
+// ---------------- Main Component ----------------
+export default function Aprobaciones() {
+  const renderEstadoCell = (estado) => {
+    let icon = null;
+    let color = "";
+
+    switch (estado) {
+      case "NA":
+        icon = <BrowserNotSupportedIcon style={{ color: "#cdcdccff" }} />;
+        color = "#cdcdccff";
+        break;
+      case "Pendiente":
+        icon = <HourglassBottomTwoToneIcon style={{ color: "#ffb74d" }} />;
+        color = "#ffb74d";
+        break;
+      case "Aprobado":
+        icon = <CheckCircleIcon style={{ color: "#81c784" }} />;
+        color = "#81c784";
+        break;
+      case "Rechazado":
+        icon = <CancelTwoToneIcon style={{ color: "#FF6A6A" }} />;
+        color = "#FF6A6A";
+        break;
+      default:
+        icon = null;
+        color = "#999";
+    }
+
+    return (
+      <span
+        style={{
+          display: "flex",
+          alignItems: "center",
+          fontWeight: "bold",
+          color,
+          justifyContent: "center",
+        }}
+      >
+        {icon}
+        {/*   <span style={{ marginLeft: 6 }}>{estado}</span> */}
+      </span>
+    );
+  };
+  // ---------------- States ----------------
+  const [emp_id, setEmp_id] = useState(null);
+  const [rows, setRows] = useState([]);
+  const [rowsEsperando, setRowsEsperando] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [openVisualizar, setOpenVisualizar] = useState(false);
   const [folioRows, setFolioRows] = useState([]);
   const [materialRows, setMaterialRows] = useState([]);
   const [paqueteriaRows, setPaqueteriaRows] = useState([]);
+  const [idSelected, setIdSelected] = useState(null);
   const [ocultarBoton, setOcultarBoton] = useState(false);
 
-  const handleClickVerFolio = async (folio_id) => {
-    try {
-      const buscarFolio = await axios.get(
-        `/api/folio_consultas/?folio_id=${folio_id}`
-      );
-      if (buscarFolio.data.length > 0) {
-        setFolioRows(buscarFolio.data[0]);
-      } else {
-        console.log("No se encontró registro");
-      }
+  const [value, setValue] = useState(0);
 
-      const buscarMaterial = await axios.get(
-        `/api/material_consultas/?folio_id=${folio_id}`
-      );
-      if (buscarMaterial.data.length > 0) {
-        setMaterialRows(buscarMaterial.data);
-      } else {
-        console.log("No se encontró material");
-      }
-
-      const buscarPaqueteria = await axios.get(
-        `/api/paqueteria/?folio_id=${folio_id}`
-      );
-      console.log("la paq es", buscarPaqueteria.data);
-      if (buscarPaqueteria.data.length > 0) {
-        setPaqueteriaRows(buscarPaqueteria.data);
-      } else {
-        console.log("No se encontró paquetería");
-      }
-
-      setOpenVisualizar(true);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-  //*******************Esperando aprobacion ************/
-  const [rowsEsperando, setRowsEsperando] = useState([]);
-  const columnsEsperando = [
-    {
-      field: "acciones",
-      headerName: "Accion",
-      flex: 0.7,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => (
-        <Button
-          variant="outlined"
-          onClick={() => handleClickVerFolio(params.row.folio_id)}
-        >
-          <VisibilityIcon />
-        </Button>
-      ),
-    },
-    { field: "folio_id", headerName: "Folio", flex: 0.5, align: "center" },
-    { field: "fecha", headerName: "Fecha", flex: 0.75, editable: false },
-    {
-      field: "responsable1",
-      headerName: "Aprobador",
-      flex: 2,
-      editable: false,
-    },
-    { field: "status_1", headerName: "Estado", flex: 0.7, editable: false },
-    { field: "suplente", headerName: "Suplente", flex: 2, editable: false },
-    { field: "status_S", headerName: "Estado", flex: 0.7, editable: false },
-    {
-      field: "responsable2",
-      headerName: "Aprobador 2",
-      flex: 2,
-      editable: false,
-    },
-    { field: "status_2", headerName: "Estado", flex: 0.7, editable: false },
-  ];
-
-  //******************************* */
-  const [emp_id, setEmp_id] = useState(null);
-  const [idSelected, setIdSelected] = useState(null);
+  // ---------------- Fetch emp_id desde localStorage ----------------
   useEffect(() => {
-    const emp_id_value = localStorage.getItem("emp_id");
-    setEmp_id(emp_id_value);
+    const stored = localStorage.getItem("emp_id");
+    if (stored) setEmp_id(stored);
   }, []);
 
-  const [rows, setRows] = useState([]);
+  // ---------------- Fetch Data ----------------
+  useEffect(() => {
+    if (!emp_id) return;
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        const [res1, res2] = await Promise.all([
+          axios.get(`/api/folio_consultas/?emp_id=${emp_id}`),
+          axios.get(`/api/folio_consultas_create_by/?emp_id=${emp_id}`),
+        ]);
+        if (!isMounted) return;
+
+        setRows(res1.data);
+        setRowsEsperando(res2.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error al obtener datos:", err);
+      }
+    };
+
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, [emp_id]);
+
+  // ---------------- Handlers ----------------
+  const handleClickVerFolio = async (folio_id) => {
+    let isMounted = true;
+    try {
+      const [folioRes, materialRes, paqueteriaRes] = await Promise.all([
+        axios.get(`/api/folio_consultas/?folio_id=${folio_id}`),
+        axios.get(`/api/material_consultas/?folio_id=${folio_id}`),
+        axios.get(`/api/paqueteria/?folio_id=${folio_id}`),
+      ]);
+      if (!isMounted) return;
+
+      setFolioRows(folioRes.data[0] || []);
+      setMaterialRows(materialRes.data || []);
+      setPaqueteriaRows(paqueteriaRes.data || []);
+      setOpenVisualizar(true);
+    } catch (err) {
+      console.error("Error al obtener folio:", err);
+    }
+  };
+
+  const handleClickRow = (params) => {
+    setIdSelected(params.id);
+    setOcultarBoton(true);
+  };
+
+  const handleClickRowEsperando = (params) => {
+    setIdSelected(params.id);
+    setOcultarBoton(false);
+  };
+
+  const handleChangeTab = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  if (loading)
+    return (
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    );
+
+  // ---------------- Columns ----------------
   const columns = [
     {
       field: "acciones",
@@ -150,119 +201,118 @@ function Aprobaciones() {
     { field: "fecha", headerName: "Fecha", flex: 1 },
     { field: "creado_por", headerName: "Requisitor", flex: 2 },
     { field: "responsable1", headerName: "Aprobador", flex: 2 },
-    { field: "status_1", headerName: "Estado", flex: 0.9 },
+    {
+      field: "status_1",
+      headerName: "Estado",
+      flex: 0.9,
+      renderCell: (params) => renderEstadoCell(params.value),
+    },
     { field: "suplente", headerName: "Suplente", flex: 2 },
-    { field: "status_S", headerName: "Estado", flex: 0.9 },
+    {
+      field: "status_S",
+      headerName: "Estado",
+      flex: 0.9,
+      renderCell: (params) => renderEstadoCell(params.value),
+    },
     { field: "responsable2", headerName: "Aprobador 2", flex: 2 },
-    { field: "status_2", headerName: "Estado", flex: 1 },
+    {
+      field: "status_2",
+      headerName: "Estado",
+      flex: 1,
+      renderCell: (params) => renderEstadoCell(params.value),
+    },
   ];
 
-  useEffect(() => {
-    if (!emp_id) return;
+  const columnsEsperando = [
+    {
+      field: "acciones",
+      headerName: "Accion",
+      flex: 0.7,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => (
+        <Button
+          variant="outlined"
+          onClick={() => handleClickVerFolio(params.row.folio_id)}
+        >
+          <VisibilityIcon />
+        </Button>
+      ),
+    },
+    { field: "folio_id", headerName: "Folio", flex: 0.5, align: "center" },
+    { field: "fecha", headerName: "Fecha", flex: 0.75 },
+    { field: "responsable1", headerName: "Aprobador", flex: 2 },
+    {
+      field: "status_1",
+      headerName: "Estado",
+      flex: 0.9,
+      renderCell: (params) => renderEstadoCell(params.value),
+    },
+    { field: "suplente", headerName: "Suplente", flex: 2 },
+    {
+      field: "status_S",
+      headerName: "Estado",
+      flex: 0.9,
+      renderCell: (params) => renderEstadoCell(params.value),
+    },
+    { field: "responsable2", headerName: "Aprobador 2", flex: 2 },
+    {
+      field: "status_2",
+      headerName: "Estado",
+      flex: 1,
+      renderCell: (params) => renderEstadoCell(params.value),
+    },
+  ];
 
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(`/api/folio_consultas/?emp_id=${emp_id}`);
-        setRows(res.data);
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          console.error("Error al obtener artículos:", {
-            status: err.response?.status,
-            data: err.response?.data,
-            message: err.message,
-          });
-        } else {
-          console.error("Error desconocido:", err);
-        }
-      }
-    };
-    const fetchData2 = async () => {
-      try {
-        const res = await axios.get(
-          `/api/folio_consultas_create_by/?emp_id=${emp_id}`
-        );
-        setRowsEsperando(res.data);
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          console.error("Error al obtener informacion:", {
-            status: err.response?.status,
-            data: err.response?.data,
-            message: err.message,
-          });
-        } else {
-          console.error("Error desconocido:", err);
-        }
-      }
-    };
-    fetchData();
-    fetchData2();
-  }, [emp_id]);
-  const [value, setValue] = useState(0);
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
-  const handleClickRow = async (params) => {
-    setIdSelected(params.id);
-    setOcultarBoton(true);
-  };
-  const handleClickRowEsperando = async (params) => {
-    setOcultarBoton(false);
-    setIdSelected(params.id);
-  };
+  // ---------------- Styles ----------------
+  const StylePestañas = { fontSize: "12px" };
+
   return (
     <div
       style={{
         display: "flex",
         justifyContent: "center",
-        // width: "100%",
         marginLeft: "6cm",
         marginRight: "5.5cm",
         marginTop: "1cm",
-        background: "rgb(250,250,250)",
-
+        background: "rgb(255,255,255)",
         height: "33rem",
       }}
     >
       <Box sx={{ width: "100%" }}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <Tabs
-            value={value}
-            onChange={handleChange}
-            aria-label="basic tabs example"
-          >
+          <Tabs value={value} onChange={handleChangeTab}>
             <Tab
               label="Esperando aprobacion..."
               {...a11yProps(0)}
               sx={StylePestañas}
             />
-            <Tab label="Aprobar " {...a11yProps(1)} sx={StylePestañas} />
+            <Tab label="Aprobar" {...a11yProps(1)} sx={StylePestañas} />
           </Tabs>
         </Box>
+
+        {/* DataGrid para Aprobar */}
         <CustomTabPanel value={value} index={1}>
           <div style={{ height: 400, width: "100%" }}>
-            {
-              <DataGrid
-                rows={rows}
-                columns={columns}
-                pageSize={5}
-                autoPageSize
-                rowsPerPageOptions={[5]}
-                getRowId={(row) => row.folio_id}
-                onRowClick={(params) => handleClickRow(params)}
-                disableSelectionOnClick
-                sx={{
-                  fontSize: "0.7rem", // 👈 ajusta el tamaño de fuente general
-                  "& .MuiDataGrid-cell": {
-                    padding: "4px", // 👈 reduce padding de celdas
-                  },
-                  "& .MuiDataGrid-columnHeaders": {
-                    fontSize: "0.85rem", // 👈 tamaño encabezados
-                  },
-                }}
-              />
-            }
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pageSize={5}
+              autoPageSize
+              rowsPerPageOptions={[5]}
+              getRowId={(row) => row.folio_id}
+              onRowClick={handleClickRow}
+              disableSelectionOnClick
+              sx={{
+                fontSize: "0.7rem",
+                "& .MuiDataGrid-cell": { padding: "4px" },
+                "& .MuiDataGrid-columnHeaders": { fontSize: "0.85rem" },
+              }}
+            />
           </div>
         </CustomTabPanel>
+
+        {/* DataGrid para Esperando */}
         <CustomTabPanel value={value} index={0}>
           <div style={{ height: 400, width: "100%" }}>
             <DataGrid
@@ -272,20 +322,18 @@ function Aprobaciones() {
               autoPageSize
               rowsPerPageOptions={[5]}
               getRowId={(row) => row.folio_id}
-              onRowClick={(params) => handleClickRowEsperando(params)}
+              onRowClick={handleClickRowEsperando}
               disableSelectionOnClick
               sx={{
-                fontSize: "0.7rem", // 👈 ajusta el tamaño de fuente general
-                "& .MuiDataGrid-cell": {
-                  padding: "4px", // 👈 reduce padding de celdas
-                },
-                "& .MuiDataGrid-columnHeaders": {
-                  fontSize: "0.85rem", // 👈 tamaño encabezados
-                },
+                fontSize: "0.7rem",
+                "& .MuiDataGrid-cell": { padding: "4px" },
+                "& .MuiDataGrid-columnHeaders": { fontSize: "0.85rem" },
               }}
             />
           </div>
         </CustomTabPanel>
+
+        {/* Modal Visualizar */}
         <Visualizar
           open={openVisualizar}
           setOpen={setOpenVisualizar}
@@ -300,19 +348,3 @@ function Aprobaciones() {
     </div>
   );
 }
-const StylePestañas = {
-  fontSize: "12px",
-};
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 800,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-  fontSize: "0.5rem",
-};
-export default Aprobaciones;

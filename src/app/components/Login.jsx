@@ -40,7 +40,6 @@ export function Formulario() {
   const [user, setUser] = useState([]);
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
-    console.log(e.target.value, e.target.name);
   };
   const irAConsultas = () => {
     router.push("/consultas");
@@ -59,7 +58,7 @@ export function Formulario() {
       try {
         setLoading(true);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_AUTH_SERVER_URL}/SHIPPING_AD/AUTHENTICATE`,
+          `${process.env.NEXT_PUBLIC_AUTH_SERVER_URL}/MATERIAL_FLOW_AD/AUTHENTICATE`,
           {
             method: "POST",
             headers: {
@@ -118,7 +117,7 @@ export function Formulario() {
     try {
       setLoading(true);
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_AUTH_SERVER_URL}/SHIPPING_AD/AUTHENTICATE`,
+        `${process.env.NEXT_PUBLIC_AUTH_SERVER_URL}/MATERIAL_FLOW_AD/AUTHENTICATE`,
         {
           method: "POST",
           headers: {

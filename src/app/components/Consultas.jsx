@@ -2,7 +2,6 @@
 import {
   AppBar,
   Box,
-  Button,
   Drawer,
   IconButton,
   List,
@@ -11,45 +10,41 @@ import {
   ListItemText,
   Toolbar,
   Typography,
+  Modal,
   TextField,
-  Paper,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
 } from "@mui/material";
 import { useState } from "react";
-import { DataGrid } from "@mui/x-data-grid";
 import Visualizar from "./Visualizar";
-
 import MenuIcon from "@mui/icons-material/Menu";
 import React from "react";
 import { useRouter } from "next/navigation";
-import Modal from "@mui/material/Modal";
 import axios from "axios";
 
-function consultas() {
+// 👇 teclado virtual
+import Keyboard from "react-simple-keyboard";
+import "react-simple-keyboard/build/css/index.css";
+
+function Consultas() {
   const [openVisualizar, setOpenVisualizar] = useState(false);
   const [folioRows, setFolioRows] = useState([]);
   const [materialRows, setMaterialRows] = useState([]);
   const [paqueteriaRows, setPaqueteriaRows] = useState([]);
-  const [ocultarBoton, setOcultarBoton] = useState(false);
-  const [idSelected, setIdSelected] = useState(null);
   const [rows, setRows] = useState([]);
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+  const [inputValue, setInputValue] = useState("");
+
   const router = useRouter();
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
+
   const handleChange = (e) => {
-    // Convertimos el valor a número, si quieres mantenerlo como string puedes quitar Number()
-    setIdSelected(e.target.value ? Number(e.target.value) : null);
+    setInputValue(e.target.value);
   };
+
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
       <List>
@@ -75,6 +70,7 @@ function consultas() {
       router.push("/");
     }
   };
+
   const handleClickVerFolio = async (folio_id) => {
     try {
       const buscarFolio = await axios.get(
@@ -98,7 +94,6 @@ function consultas() {
       const buscarPaqueteria = await axios.get(
         `/api/paqueteria/?folio_id=${folio_id}`
       );
-      console.log("la paq es", buscarPaqueteria.data);
       if (buscarPaqueteria.data.length > 0) {
         setPaqueteriaRows(buscarPaqueteria.data);
       } else {
@@ -111,6 +106,15 @@ function consultas() {
     }
   };
 
+  const handleKeyboardChange = (input) => {
+    setInputValue(input);
+  };
+
+  const handleKeyPress = (button) => {
+    if (button === "{enter}") {
+      setKeyboardOpen(false); // cerrar modal al presionar enter
+    }
+  };
   return (
     <div>
       <Box sx={{ flexGrow: 1 }}>
@@ -146,16 +150,18 @@ function consultas() {
       <Drawer open={open} onClose={toggleDrawer(false)}>
         {DrawerList}
       </Drawer>
+
       <Visualizar
         open={openVisualizar}
         setOpen={setOpenVisualizar}
         folioRows={folioRows}
         materialRows={materialRows}
         paqueteriaRows={paqueteriaRows}
-        ocultar={ocultarBoton}
-        idSelected={idSelected}
+        ocultar={false}
+        idSelected={inputValue}
         setRows={setRows}
       />
+
       <div
         style={{
           display: "flex",
@@ -167,14 +173,15 @@ function consultas() {
           marginTop: "1cm",
           background: "rgb(250,250,250)",
           height: "33rem",
-          gap: "1rem", // separa el textfield del botón
+          gap: "1rem",
           padding: "1rem",
         }}
       >
         <input
-          type="text" // usamos text + inputmode
-          inputMode="numeric" // fuerza teclado numérico en móviles
-          pattern="[0-9]*" // restringe solo números
+          type="text"
+          value={inputValue}
+          inputMode="numeric"
+          pattern="[0-9]*"
           placeholder="Ingresa un número"
           onChange={handleChange}
           style={{
@@ -185,6 +192,7 @@ function consultas() {
             border: "1px solid #ccc",
             textAlign: "center",
           }}
+          onClick={() => setKeyboardOpen(true)}
         />
         <button
           style={{
@@ -196,13 +204,54 @@ function consultas() {
             color: "white",
             cursor: "pointer",
           }}
-          onClick={() => handleClickVerFolio(idSelected)}
+          onClick={() => {
+            handleClickVerFolio(inputValue);
+          }}
         >
           Ver
         </button>
       </div>
+
+      {/* Modal flotante con teclado y botón cerrar */}
+      <Modal
+        open={keyboardOpen}
+        onClose={() => setKeyboardOpen(false)}
+        aria-labelledby="teclado-virtual"
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Box
+          sx={{
+            bgcolor: "background.paper",
+            p: 2,
+            borderRadius: 2,
+            boxShadow: 24,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <TextField value={inputValue}></TextField>
+          <Keyboard
+            onChange={handleKeyboardChange}
+            onKeyPress={handleKeyPress}
+            input={inputValue}
+            layout={{
+              default: ["1 2 3", "4 5 6", "7 8 9", "{bksp} 0 {enter}"],
+            }}
+            display={{
+              "{bksp}": "⌫",
+              "{enter}": "Ok",
+            }}
+          />
+        </Box>
+      </Modal>
     </div>
   );
 }
 
-export default consultas;
+export default Consultas;
