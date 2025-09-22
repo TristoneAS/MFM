@@ -51,7 +51,7 @@ function a11yProps(index) {
   };
 }
 
-function NuevoFolio() {
+function EditarFolio() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [fechaVisible, setFechaVisible] = useState(true);
@@ -241,6 +241,9 @@ function NuevoFolio() {
   const [responsable1, setResponsable1] = useState(null);
   const [suplente, setSuplente] = useState(null);
   const [responsable2, setResponsable2] = useState(null);
+  const [folioRows, setFolioRows] = useState([]);
+  const [materialRows, setMaterialRows] = useState([]);
+  const [paqueteriaRows, setPaqueteriaRows] = useState([]);
   useEffect(() => {
     axios
       .get("/api/tipo_material")
@@ -380,7 +383,43 @@ function NuevoFolio() {
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+  const [inputValue, setInputValue] = useState("");
 
+  const handleChangeBuscar = (e) => {
+    setInputValue(e.target.value);
+  };
+  const handleClickVerFolio = async (folio_id) => {
+    try {
+      const buscarFolio = await axios.get(
+        `/api/folio_consultas/?folio_id=${folio_id}`
+      );
+      if (buscarFolio.data.length > 0) {
+        setFolioRows(buscarFolio.data[0]);
+      } else {
+        console.log("No se encontró registro");
+      }
+
+      const buscarMaterial = await axios.get(
+        `/api/material_consultas/?folio_id=${folio_id}`
+      );
+      if (buscarMaterial.data.length > 0) {
+        setMaterialRows(buscarMaterial.data);
+      } else {
+        console.log("No se encontró material");
+      }
+
+      const buscarPaqueteria = await axios.get(
+        `/api/paqueteria/?folio_id=${folio_id}`
+      );
+      if (buscarPaqueteria.data.length > 0) {
+        setPaqueteriaRows(buscarPaqueteria.data);
+      } else {
+        console.log("No se encontró paquetería");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
   const [valor, setValor] = useState(""); //Para temporal o definitivo
   const [valor2, setValor2] = useState(""); //Para Categoria
   const [openModal, setOpenModal] = useState(false); //Para abrir el modal de agregar material
@@ -711,51 +750,50 @@ function NuevoFolio() {
       Success(resultado.data.id);
       setLoading(true);
       setTimeout(() => {
-        router.push("/dashboard/missolicitudes");
+        router.push("/dashboard/aprobaciones");
       }, 4000);
     } catch (error) {
       console.error("Error:", error);
     }
   };
   const [folio, setFolio] = useState({
-    folio_id: "",
-    fecha: "",
-    origen_location: "",
-    origen_direccion: "",
-    origen_contacto: "",
-    origen_correo: "",
-    destino_location: "",
-    destino_direccion: "",
-    destino_contacto: "",
-    destino_correo: "",
-    documento: "",
-    sello: "",
-    transportista: "",
-    modo_envio: "",
-    caja: "",
-    incoterm: "",
-    tipo_material: "",
-    razon: "",
-    permanente_temporal: "",
-    fecha_retorno: "",
-    creado_por: "",
-    cost_center: "",
-    cost_center_name: "",
-    categoria: "",
-    capex_po: "",
-    responsable1: "",
+    folio_id: folioRows.folio_id,
+    fecha: folioRows.fecha,
+    origen_location: folioRows.origen_location,
+    origen_direccion: folioRows.origen_direccion,
+    origen_contacto: folioRows.origen_contacto,
+    origen_correo: folioRows.origen_correo,
+    destino_location: folioRows.destino_location,
+    destino_direccion: folioRows.destino_direccion,
+    destino_contacto: folioRows.destino_contacto,
+    destino_correo: folioRows.destino_correo,
+    documento: folioRows.documento,
+    sello: folioRows.sello,
+    transportista: folioRows.transportista,
+    modo_envio: folioRows.modo_envio,
+    caja: folioRows.caja,
+    incoterm: folioRows.incoterm,
+    tipo_material: folioRows.tipo_material,
+    razon: folioRows.razon,
+    permanente_temporal: folioRows.permanente_temporal,
+    fecha_retorno: folioRows.fecha_retorno,
+    creado_por: folioRows.creado_por,
+    cost_center: folioRows.costCenter,
+    cost_center_name: folioRows.costCenterName,
+    categoria: folioRows.categoria,
+    capex_po: folioRows.capex_po,
+    responsable1: folioRows.responsable1,
     status_1: "Pendiente",
-    suplente: "",
+    suplente: folioRows.suplente,
     status_S: "Pendiente",
-    responsable2: "",
+    responsable2: folioRows.responsable2,
     status_2: "Pendiente",
-    total_cantidad: "",
-    total_pallets_cajas: "",
-    total_peso: "",
-    total_valor: "",
+    total_cantidad: folioRows.total_cantidad,
+    total_pallets_cajas: folioRows.total_pallets_cajas,
+    total_peso: folioRows.total_peso,
+    total_valor: folioRows.total_valor,
     liberado: "false",
     fecha_regreso: null,
-    retornado_por: null,
   });
   useEffect(() => {
     let origen_location = folio.origen_location !== "" ? 6 : 0;
@@ -1317,8 +1355,44 @@ function NuevoFolio() {
               fontSize: "1.5rem",
             }}
           >
-            FORMATO SALIDA DE MATERIAL
+            EDITAR FOLIO
           </h1>
+
+          <input
+            type="text"
+            inputMode="numeric"
+            value={inputValue}
+            pattern="[0-9]*"
+            placeholder="Ingresa Folio"
+            onChange={handleChangeBuscar}
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              width: "15%",
+              padding: "0.5rem",
+              fontSize: "1rem",
+              textAlign: "center",
+              marginLeft: "38rem",
+            }}
+            /*               onClick={() => setKeyboardOpen(true)}
+             */
+          />
+          <button
+            style={{
+              padding: "0.5rem 1.5rem",
+              fontSize: "1rem",
+              borderRadius: "0.5rem",
+              border: "none",
+              backgroundColor: "#1976d2",
+              color: "white",
+              cursor: "pointer",
+            }}
+            onClick={() => {
+              handleClickVerFolio(inputValue);
+            }}
+          >
+            buscar
+          </button>
         </div>
         <br />
         <div
@@ -2112,4 +2186,4 @@ const textFieldStyles = {
   }, */
 };
 
-export default NuevoFolio;
+export default EditarFolio;

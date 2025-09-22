@@ -8,7 +8,7 @@ export async function GET(request) {
     const emp_id = searchParams.get("emp_id");
     const folio_id = searchParams.get("folio_id");
     let query =
-      "SELECT folio_id,fecha,responsable1,status_1,suplente,status_S,responsable2,status_2 from folios where ((creado_por=?) and ((status_1='pendiente' and status_S='pendiente') or ((status_1!='Rechazado' or status_S!='Rechazado') and status_2='pendiente'))) ";
+      "SELECT folio_id,DATE_FORMAT(fecha,'%Y-%m-%d') AS fecha,responsable1,status_1,suplente,status_S,responsable2,status_2 from folios where ((creado_por=?) and ((status_1='pendiente' and status_S='pendiente') or ((status_1!='Rechazado' or status_S!='Rechazado') and status_2='pendiente'))) ";
     let params = [emp_id];
 
     if (folio_id) {

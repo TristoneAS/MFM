@@ -82,7 +82,7 @@ export function Formulario() {
           localStorage.setItem("isAuthenticated", "true");
 
           setTimeout(() => {
-            router.push("/dashboard");
+            router.push("/dashboard/nuevofolio");
           }, 500);
         } else {
           setSnackbarMessage(

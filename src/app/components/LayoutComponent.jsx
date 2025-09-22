@@ -22,6 +22,9 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
+import PendingIcon from "@mui/icons-material/Pending";
+import EditSquareIcon from "@mui/icons-material/EditSquare";
+import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import PersonIcon from "@mui/icons-material/Person";
@@ -101,8 +104,9 @@ export default function NavBar() {
   const iconMap = {
     Dashboard: <DashboardIcon />,
     "Nuevo Folio": <AddCircleIcon />,
-    Aprobaciones: <CheckCircleIcon />,
-    Entradas_Salidas: <SwapHorizIcon />,
+    "Editar Folio": <EditSquareIcon />,
+    "Mis Solicitudes": <ContentPasteIcon />,
+    "Mis Pendientes": <PendingIcon />,
     "Ver todos": <VisibilityIcon />,
     Configuracion: <SettingsIcon />,
   };
@@ -117,25 +121,28 @@ export default function NavBar() {
         />
       </Box>
       <List>
-        {["Dashboard", "Nuevo Folio", "Aprobaciones", "Entradas_Salidas"].map(
-          (text) => (
-            <ListItem
-              key={text}
-              disablePadding
-              onClick={() => handleClickNavegar(text)}
-            >
-              <ListItemButton>
-                <ListItemIcon>{iconMap[text]}</ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          )
-        )}
+        {[
+          "Nuevo Folio",
+          "Editar Folio",
+          "Mis Solicitudes",
+          "Mis Pendientes",
+        ].map((text) => (
+          <ListItem
+            key={text}
+            disablePadding
+            onClick={() => handleClickNavegar(text)}
+          >
+            <ListItemButton>
+              <ListItemIcon>{iconMap[text]}</ListItemIcon>
+              <ListItemText primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
       </List>
       <Divider />
       {admin && (
         <List>
-          {["Configuracion", "Ver todos"].map((text) => (
+          {["Ver todos", "Configuracion"].map((text) => (
             <ListItem
               key={text}
               disablePadding

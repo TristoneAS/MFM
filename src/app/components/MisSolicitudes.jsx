@@ -8,21 +8,45 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { DataGrid } from "@mui/x-data-grid";
 import { Button, Box, Tabs, Tab } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+
 import HourglassBottomTwoToneIcon from "@mui/icons-material/HourglassBottomTwoTone";
 import CancelTwoToneIcon from "@mui/icons-material/CancelTwoTone";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import BrowserNotSupportedIcon from "@mui/icons-material/BrowserNotSupported";
 
 import Visualizar from "./Visualizar";
-function VerTodos() {
-  const [rows, setRows] = useState([]);
-  const [idSelected, setIdSelected] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  const [openVisualizar, setOpenVisualizar] = useState(false);
-  const [folioRows, setFolioRows] = useState([]);
-  const [materialRows, setMaterialRows] = useState([]);
-  const [paqueteriaRows, setPaqueteriaRows] = useState([]);
+// ---------------- Custom Tab Panel ----------------
+function CustomTabPanel(props) {
+  const { children, value, index, ...other } = props;
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
+
+CustomTabPanel.propTypes = {
+  children: PropTypes.node,
+  index: PropTypes.number.isRequired,
+  value: PropTypes.number.isRequired,
+};
+
+function a11yProps(index) {
+  return {
+    id: `simple-tab-${index}`,
+    "aria-controls": `simple-tabpanel-${index}`,
+  };
+}
+
+// ---------------- Main Component ----------------
+export default function MisSolicitudes() {
   const renderEstadoCell = (estado) => {
     let icon = null;
     let color = "";
@@ -33,8 +57,8 @@ function VerTodos() {
         color = "#cdcdccff";
         break;
       case "Pendiente":
-        icon = <HourglassBottomTwoToneIcon style={{ color: "#dec223ff" }} />;
-        color = "#dec223ff";
+        icon = <HourglassBottomTwoToneIcon style={{ color: "#ffb74d" }} />;
+        color = "#ffb74d";
         break;
       case "Aprobado":
         icon = <CheckCircleIcon style={{ color: "#81c784" }} />;
@@ -64,7 +88,22 @@ function VerTodos() {
       </span>
     );
   };
+  // ---------------- States ----------------
+  const [emp_id, setEmp_id] = useState(null);
+  const [rows, setRows] = useState([]);
+  const [rowsEsperando, setRowsEsperando] = useState([]);
+  const [rowsAprobadas, setRowsAprobadas] = useState([]);
+  const [rowsRechazadas, setRowsRechazadas] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  const [openVisualizar, setOpenVisualizar] = useState(false);
+  const [folioRows, setFolioRows] = useState([]);
+  const [materialRows, setMaterialRows] = useState([]);
+  const [paqueteriaRows, setPaqueteriaRows] = useState([]);
+  const [idSelected, setIdSelected] = useState(null);
+  const [ocultarBoton, setOcultarBoton] = useState(false);
+
+  const [value, setValue] = useState(0);
   const columns = [
     {
       field: "acciones",
@@ -218,17 +257,30 @@ function VerTodos() {
       },
     },
   ];
+  // ---------------- Fetch emp_id desde localStorage ----------------
   useEffect(() => {
+    const stored = localStorage.getItem("emp_id");
+    if (stored) setEmp_id(stored);
+  }, []);
+
+  // ---------------- Fetch Data ----------------
+  useEffect(() => {
+    if (!emp_id) return;
     let isMounted = true;
 
     const fetchData = async () => {
       try {
-        const [res1] = await Promise.all([
-          axios.get(`/api/folio_consultas/?vertodo=true`),
+        const [res, res2, res3] = await Promise.all([
+          axios.get(`/api/folio_consultas/?emp_id=${emp_id}&Esperando=true`),
+          axios.get(`/api/folio_consultas/?emp_id=${emp_id}&Aprobados=true`),
+          axios.get(`/api/folio_consultas/?emp_id=${emp_id}&Rechazados=true`),
         ]);
         if (!isMounted) return;
 
-        setRows(res1.data);
+        /*    setRows(res1.data); */
+        setRowsEsperando(res.data);
+        setRowsAprobadas(res2.data);
+        setRowsRechazadas(res3.data);
         setLoading(false);
       } catch (err) {
         console.error("Error al obtener datos:", err);
@@ -239,7 +291,9 @@ function VerTodos() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [emp_id]);
+
+  // ---------------- Handlers ----------------
   const handleClickVerFolio = async (folio_id) => {
     let isMounted = true;
     try {
@@ -258,9 +312,21 @@ function VerTodos() {
       console.error("Error al obtener folio:", err);
     }
   };
+
   const handleClickRow = (params) => {
     setIdSelected(params.id);
+    setOcultarBoton(true);
   };
+
+  const handleClickRowEsperando = (params) => {
+    setIdSelected(params.id);
+    setOcultarBoton(false);
+  };
+
+  const handleChangeTab = (event, newValue) => {
+    setValue(newValue);
+  };
+
   if (loading)
     return (
       <Backdrop
@@ -270,6 +336,10 @@ function VerTodos() {
         <CircularProgress color="inherit" />
       </Backdrop>
     );
+
+  // ---------------- Styles ----------------
+  const StylePestañas = { fontSize: "12px" };
+
   return (
     <div
       style={{
@@ -282,38 +352,123 @@ function VerTodos() {
         borderRadius: "3px",
       }}
     >
-      {" "}
-      <div
-        style={{ display: "flex", height: "80vh", width: "95%", mt: "20cm" }}
+      <Box
+        style={{
+          display: "flex",
+          height: "85vh",
+          width: "95%",
+          mt: "20cm",
+          flexDirection: "column",
+        }}
       >
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          pageSize={5}
-          autoPageSize
-          rowsPerPageOptions={[5]}
-          onRowClick={handleClickRow}
-          getRowId={(row) => row.folio_id}
-          disableSelectionOnClick
-          sx={{
-            fontSize: "0.7rem",
-            "& .MuiDataGrid-cell": { padding: "4px" },
-            "& .MuiDataGrid-columnHeaders": { fontSize: "0.85rem" },
-          }}
+        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+          <Tabs value={value} onChange={handleChangeTab}>
+            <Tab label="Sin aprobar" {...a11yProps(0)} sx={StylePestañas} />
+            <Tab label="Aprobadas" {...a11yProps(1)} sx={StylePestañas} />
+            <Tab label="Rechazadas" {...a11yProps(2)} sx={StylePestañas} />
+          </Tabs>
+        </Box>
+
+        {/* DataGrid para Esperando */}
+        <CustomTabPanel value={value} index={0}>
+          <div style={{ height: 400, width: "100%" }}>
+            <div
+              style={{
+                display: "flex",
+                height: "75vh",
+                width: "100%",
+                mt: "20cm",
+              }}
+            >
+              <DataGrid
+                rows={rowsEsperando}
+                columns={columns}
+                pageSize={5}
+                autoPageSize
+                rowsPerPageOptions={[5]}
+                getRowId={(row) => row.folio_id}
+                onRowClick={handleClickRowEsperando}
+                disableSelectionOnClick
+                sx={{
+                  fontSize: "0.7rem",
+                  "& .MuiDataGrid-cell": { padding: "4px" },
+                  "& .MuiDataGrid-columnHeaders": { fontSize: "0.85rem" },
+                }}
+              />
+            </div>
+          </div>
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={1}>
+          <div style={{ height: 400, width: "100%" }}>
+            <div
+              style={{
+                display: "flex",
+                height: "75vh",
+                width: "100%",
+                mt: "20cm",
+              }}
+            >
+              <DataGrid
+                rows={rowsAprobadas}
+                columns={columns}
+                pageSize={5}
+                autoPageSize
+                rowsPerPageOptions={[5]}
+                getRowId={(row) => row.folio_id}
+                onRowClick={handleClickRowEsperando}
+                disableSelectionOnClick
+                sx={{
+                  fontSize: "0.7rem",
+                  "& .MuiDataGrid-cell": { padding: "4px" },
+                  "& .MuiDataGrid-columnHeaders": { fontSize: "0.85rem" },
+                }}
+              />
+            </div>
+          </div>
+        </CustomTabPanel>
+        <CustomTabPanel value={value} index={2}>
+          {" "}
+          <div style={{ height: 400, width: "100%" }}>
+            <div
+              style={{
+                display: "flex",
+                height: "75vh",
+                width: "100%",
+                mt: "20cm",
+              }}
+            >
+              <DataGrid
+                rows={rowsRechazadas}
+                columns={columns}
+                pageSize={5}
+                autoPageSize
+                rowsPerPageOptions={[5]}
+                getRowId={(row) => row.folio_id}
+                onRowClick={handleClickRowEsperando}
+                disableSelectionOnClick
+                sx={{
+                  fontSize: "0.7rem",
+                  "& .MuiDataGrid-cell": { padding: "4px" },
+                  "& .MuiDataGrid-columnHeaders": { fontSize: "0.85rem" },
+                }}
+              />
+            </div>
+          </div>
+        </CustomTabPanel>
+        {/* DataGrid para Aprobar */}
+
+        {/* Modal Visualizar */}
+        <Visualizar
+          open={openVisualizar}
+          setOpen={setOpenVisualizar}
+          folioRows={folioRows}
+          materialRows={materialRows}
+          paqueteriaRows={paqueteriaRows}
+          ocultar={ocultarBoton}
+          idSelected={idSelected}
+          setRows={setRows}
         />
-      </div>
-      <Visualizar
-        open={openVisualizar}
-        setOpen={setOpenVisualizar}
-        folioRows={folioRows}
-        materialRows={materialRows}
-        paqueteriaRows={paqueteriaRows}
-        ocultar={false}
-        idSelected={idSelected}
-        setRows={setRows}
-      />
+      </Box>
     </div>
   );
 }
-
-export default VerTodos;

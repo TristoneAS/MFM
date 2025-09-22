@@ -60,6 +60,8 @@ export async function POST(request) {
       total_valor,
       documento,
       liberado,
+      fecha_regreso,
+      retornado_por,
     } = await request.json();
 
     const query = "SELECT emp_id FROM del_empleados WHERE emp_nombre = ?";
@@ -110,6 +112,8 @@ export async function POST(request) {
       total_valor,
       documento,
       liberado,
+      fecha_regreso,
+      retornado_por,
     });
 
     return NextResponse.json({

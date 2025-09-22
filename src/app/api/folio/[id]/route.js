@@ -22,7 +22,7 @@ export async function PUT(request, context) {
   try {
     const { id } = await context.params;
     const body = await request.json();
-    const { createdby, status, liberar } = body;
+    const { createdby, status, liberar, fecha_regreso, emp_id } = body;
     console.log("Folio:", id);
     console.log("createdby:", createdby);
 
@@ -79,7 +79,13 @@ export async function PUT(request, context) {
     }
     if (liberar === "true") {
       [result] = await conn.query(
-        "UPDATE folios SET liberado='" + [liberar] + "' WHERE folio_id = ?",
+        "UPDATE folios SET liberado='" +
+          [liberar] +
+          "',fecha_regreso='" +
+          [fecha_regreso] +
+          "',retornado_por='" +
+          [emp_id] +
+          "' WHERE folio_id = ?",
         [id]
       );
     }

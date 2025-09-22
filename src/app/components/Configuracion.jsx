@@ -22,6 +22,7 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
+import { Update } from "@mui/icons-material";
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -953,8 +954,10 @@ function Configuracion() {
             `/api/unidad_medida/${idSelectedunidad_medida}`,
             unidad_medida
           );
+          update("Unidad de medida ");
         } else {
           await axios.post("/api/unidad_medida/", unidad_medida);
+          Success("Unidad de medida ");
           const res2 = await axios.get("/api/unidad_medida/");
           setRowsUnidad_medida(res2.data);
           setBtnAddUnidad_medida(false);
@@ -975,7 +978,7 @@ function Configuracion() {
           const res = await axios.delete(
             `/api/unidad_medida/${idSelectedunidad_medida}`
           );
-
+          Delete("Unidad de medida ");
           const res2 = await axios.get("/api/unidad_medida/");
           setRowsUnidad_medida(res2.data);
         }
@@ -1142,8 +1145,10 @@ function Configuracion() {
         );
         if (buscar.data.length > 0) {
           await axios.put(`/api/locacion/${idSelectedLocacion}`, locacion);
+          Success("Locacion ");
         } else {
           await axios.post("/api/locacion/", locacion);
+          update("Locacion ");
           const res2 = await axios.get("/api/locacion/");
           setRowsLocacion(res2.data);
           setBtnAddLocacion(false);
@@ -1163,7 +1168,7 @@ function Configuracion() {
       try {
         if (confirm(`Eliminar id ${idSelectedLocacion}?`)) {
           const res = await axios.delete(`/api/locacion/${idSelectedLocacion}`);
-
+          Delete("Locacion ");
           const res2 = await axios.get("/api/locacion/");
           setRowsLocacion(res2.data);
         }
@@ -1316,11 +1321,11 @@ function Configuracion() {
           `/api/tipo_material/${idSelectedTipo_material}`,
           material
         );
-
+        update("Tipo de material ");
         setOpenModalEditar(false);
       } else {
         await axios.post("/api/tipo_material/", material);
-
+        Success("Tipo de material ");
         /*  setBtnAddTipo_material(false);
         setBtnDeleteTipo_material(true);
         setBtnSaveTipo_material(true); */
@@ -1360,7 +1365,7 @@ function Configuracion() {
           const res = await axios.delete(
             `/api/tipo_material/${idSelectedTipo_material}`
           );
-
+          Delete("Tipo de material ");
           const res2 = await axios.get("/api/tipo_material/");
           setRowsTipo_material(res2.data);
         }
