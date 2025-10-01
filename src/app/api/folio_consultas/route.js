@@ -13,6 +13,9 @@ export async function GET(request) {
     const revisar = searchParams.get("Revisar") === "true";
     const retornos = searchParams.get("retornos") === "true";
     const vertodo = searchParams.get("vertodo") === "true";
+    const misAprobados = searchParams.get("misAprobados") === "true";
+    const misRechazados = searchParams.get("misRechazados") === "true";
+    const misRetornados = searchParams.get("misRetornados") === "true";
     let query =
       "SELECT folio_id,DATE_FORMAT(fecha,'%Y-%m-%d') AS fecha,creado_por,responsable1,status_1,suplente,status_S,responsable2,status_2 from folios where ((responsable1=? or suplente=?) and (status_1='pendiente' and status_S='pendiente')) or ((responsable2=?&&status_2='pendiente') and (status_1='Aprobado' or status_S='Aprobado') ) ";
     let params = [emp_id, emp_id, emp_id];
@@ -27,7 +30,7 @@ export async function GET(request) {
     }
     if (esperando) {
       query =
-        "SELECT folio_id,DATE_FORMAT(fecha,'%Y-%m-%d') AS fecha,creado_por,responsable1,status_1,suplente,status_S,responsable2,status_2,liberado,DATE_FORMAT(fecha_regreso,'%Y-%m-%d') AS fecha_regreso, DATEDIFF(fecha_retorno, CURDATE()) AS dias_restantes, CASE WHEN DATEDIFF(fecha_retorno, CURDATE()) < 0 THEN 'Vencido'   WHEN DATEDIFF(fecha_retorno, CURDATE()) = 0 THEN 'Hoy'  WHEN DATEDIFF(fecha_retorno, CURDATE()) BETWEEN 1 AND 5 THEN 'Próximos 5 días' ELSE 'Más de 5 días' END AS estado_retorno from folios where ((creado_por=?) and ((status_1='pendiente' and status_S='pendiente') or ((status_1!='Rechazado' or status_S!='Rechazado') and status_2='pendiente')))";
+        "SELECT folio_id,DATE_FORMAT(fecha,'%Y-%m-%d') AS fecha,creado_por,responsable1,status_1,suplente,status_S,responsable2,status_2,liberado,DATE_FORMAT(fecha_regreso,'%Y-%m-%d') AS fecha_regreso, DATEDIFF(fecha_retorno, CURDATE()) AS dias_restantes, CASE WHEN DATEDIFF(fecha_retorno, CURDATE()) < 0 THEN 'Vencido'   WHEN DATEDIFF(fecha_retorno, CURDATE()) = 0 THEN 'Hoy'  WHEN DATEDIFF(fecha_retorno, CURDATE()) BETWEEN 1 AND 5 THEN 'Próximos 5 días' ELSE 'Más de 5 días' END AS estado_retorno from folios where ((creado_por=?) and ((status_1='pendiente' and status_S='pendiente') or ((status_1!='Rechazado' and status_S!='Rechazado') and status_2='pendiente')))";
       params = [emp_id];
     }
     if (aprobados) {
@@ -49,6 +52,21 @@ export async function GET(request) {
       query =
         "SELECT folio_id,DATE_FORMAT(fecha,'%Y-%m-%d') AS fecha,creado_por,responsable1,status_1,suplente,status_S,responsable2,status_2,liberado,DATE_FORMAT(fecha_regreso,'%Y-%m-%d') AS fecha_regreso, DATEDIFF(fecha_retorno, CURDATE()) AS dias_restantes, CASE WHEN DATEDIFF(fecha_retorno, CURDATE()) < 0 THEN 'Vencido'   WHEN DATEDIFF(fecha_retorno, CURDATE()) = 0 THEN 'Hoy'  WHEN DATEDIFF(fecha_retorno, CURDATE()) BETWEEN 1 AND 5 THEN 'Próximos 5 días' ELSE 'Más de 5 días' END AS estado_retorno from folios ";
       params = [];
+    }
+    if (misAprobados) {
+      query =
+        "SELECT folio_id,DATE_FORMAT(fecha,'%Y-%m-%d') AS fecha,creado_por,responsable1,status_1,suplente,status_S,responsable2,status_2,liberado,DATE_FORMAT(fecha_regreso,'%Y-%m-%d') AS fecha_regreso, DATEDIFF(fecha_retorno, CURDATE()) AS dias_restantes, CASE WHEN DATEDIFF(fecha_retorno, CURDATE()) < 0 THEN 'Vencido'   WHEN DATEDIFF(fecha_retorno, CURDATE()) = 0 THEN 'Hoy'  WHEN DATEDIFF(fecha_retorno, CURDATE()) BETWEEN 1 AND 5 THEN 'Próximos 5 días' ELSE 'Más de 5 días' END AS estado_retorno from folios where (responsable1=? and status_1='Aprobado') or (suplente=? and status_S='Aprobado') or (responsable2=? and status_2='Aprobado') ";
+      params = [emp_id, emp_id, emp_id];
+    }
+    if (misRechazados) {
+      query =
+        "SELECT folio_id,DATE_FORMAT(fecha,'%Y-%m-%d') AS fecha,creado_por,responsable1,status_1,suplente,status_S,responsable2,status_2,liberado,DATE_FORMAT(fecha_regreso,'%Y-%m-%d') AS fecha_regreso, DATEDIFF(fecha_retorno, CURDATE()) AS dias_restantes, CASE WHEN DATEDIFF(fecha_retorno, CURDATE()) < 0 THEN 'Vencido'   WHEN DATEDIFF(fecha_retorno, CURDATE()) = 0 THEN 'Hoy'  WHEN DATEDIFF(fecha_retorno, CURDATE()) BETWEEN 1 AND 5 THEN 'Próximos 5 días' ELSE 'Más de 5 días' END AS estado_retorno from folios where (responsable1=? and status_1='Rechazado') or (suplente=? and status_S='Rechazado') or (responsable2=? and status_2='Rechazado') ";
+      params = [emp_id, emp_id, emp_id];
+    }
+    if (misRetornados) {
+      query =
+        "SELECT folio_id,DATE_FORMAT(fecha,'%Y-%m-%d') AS fecha,creado_por,responsable1,status_1,suplente,status_S,responsable2,status_2,liberado,DATE_FORMAT(fecha_regreso,'%Y-%m-%d') AS fecha_regreso, DATEDIFF(fecha_retorno, CURDATE()) AS dias_restantes, CASE WHEN DATEDIFF(fecha_retorno, CURDATE()) < 0 THEN 'Vencido'   WHEN DATEDIFF(fecha_retorno, CURDATE()) = 0 THEN 'Hoy'  WHEN DATEDIFF(fecha_retorno, CURDATE()) BETWEEN 1 AND 5 THEN 'Próximos 5 días' ELSE 'Más de 5 días' END AS estado_retorno from folios where retornado_por=? ";
+      params = [emp_id];
     }
     const [rows] = await conn.query(query, params);
     for (const eachRow of rows) {

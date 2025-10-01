@@ -24,6 +24,7 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import DirectionsWalkIcon from "@mui/icons-material/DirectionsWalk";
 import PendingIcon from "@mui/icons-material/Pending";
 import EditSquareIcon from "@mui/icons-material/EditSquare";
+import HistoryIcon from "@mui/icons-material/History";
 import ContentPasteIcon from "@mui/icons-material/ContentPaste";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -83,7 +84,6 @@ export default function NavBar() {
             break;
           }
         }
-        console.log("los reoles son:", parsedUserInfo.roles);
         ///////////******************************************************************************************************************************************* */
         if (users && users.length > 0) {
           const cn = users[0].cn;
@@ -104,9 +104,9 @@ export default function NavBar() {
   const iconMap = {
     Dashboard: <DashboardIcon />,
     "Nuevo Folio": <AddCircleIcon />,
-    "Editar Folio": <EditSquareIcon />,
     "Mis Solicitudes": <ContentPasteIcon />,
     "Mis Pendientes": <PendingIcon />,
+    Historial: <HistoryIcon />,
     "Ver todos": <VisibilityIcon />,
     Configuracion: <SettingsIcon />,
   };
@@ -121,23 +121,20 @@ export default function NavBar() {
         />
       </Box>
       <List>
-        {[
-          "Nuevo Folio",
-          "Editar Folio",
-          "Mis Solicitudes",
-          "Mis Pendientes",
-        ].map((text) => (
-          <ListItem
-            key={text}
-            disablePadding
-            onClick={() => handleClickNavegar(text)}
-          >
-            <ListItemButton>
-              <ListItemIcon>{iconMap[text]}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        {["Nuevo Folio", "Mis Solicitudes", "Mis Pendientes", "Historial"].map(
+          (text) => (
+            <ListItem
+              key={text}
+              disablePadding
+              onClick={() => handleClickNavegar(text)}
+            >
+              <ListItemButton>
+                <ListItemIcon>{iconMap[text]}</ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          )
+        )}
       </List>
       <Divider />
       {admin && (

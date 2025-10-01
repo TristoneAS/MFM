@@ -78,15 +78,29 @@ export default function MisPendientes() {
 
     const fetchData = async () => {
       try {
-        const [revisar, temporales] = await Promise.all([
-          axios.get(`/api/folio_consultas/?emp_id=${emp_id}&Revisar=true`),
-          axios.get(`/api/folio_consultas/?emp_id=${emp_id}&retornos=true`),
-        ]);
+        const [revisar, temporales, aprobados, Rechazados, retornados] =
+          await Promise.all([
+            axios.get(`/api/folio_consultas/?emp_id=${emp_id}&Revisar=true`),
+            axios.get(`/api/folio_consultas/?emp_id=${emp_id}&retornos=true`),
+            axios.get(
+              `/api/folio_consultas/?emp_id=${emp_id}&misAprobados=true`
+            ),
+
+            axios.get(
+              `/api/folio_consultas/?emp_id=${emp_id}&misRechazados=true`
+            ),
+            axios.get(
+              `/api/folio_consultas/?emp_id=${emp_id}&misRetornados=true`
+            ),
+          ]);
 
         if (!isMounted) return;
 
         setRowsRevisar(revisar.data);
         setRowsTemporales(temporales.data);
+        setRowsAprobados(aprobados.data);
+        setRowsRechazados(Rechazados.data);
+        setRowsRetornados(retornados.data);
         setLoading(false);
       } catch (err) {
         console.error("Error al obtener datos:", err);
@@ -253,7 +267,25 @@ export default function MisPendientes() {
             </span>
           );
         }
-
+        if (dias < -1000) {
+          return (
+            <span
+              style={{
+                padding: "4px 8px",
+                borderRadius: "4px",
+                fontWeight: "bold",
+                textAlign: "center",
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#555",
+              }}
+            >
+              N/A
+            </span>
+          );
+        }
         // Determinar color según estado
         let color = "";
         let textColor = "#000";
@@ -553,21 +585,6 @@ export default function MisPendientes() {
           <Tabs value={value} onChange={handleChangeTab}>
             <Tab label="Aprobar" {...a11yProps(0)} sx={StylePestañas} />
             <Tab label="Retornar" {...a11yProps(1)} sx={StylePestañas} />
-            <Tab
-              label="Aprobados por mi"
-              {...a11yProps(2)}
-              sx={StylePestañas}
-            />{" "}
-            <Tab
-              label="Rechazados por mi"
-              {...a11yProps(3)}
-              sx={StylePestañas}
-            />{" "}
-            <Tab
-              label="Retornados por mi"
-              {...a11yProps(4)}
-              sx={StylePestañas}
-            />
           </Tabs>
         </Box>
 
@@ -631,91 +648,7 @@ export default function MisPendientes() {
             </div>
           </div>
         </CustomTabPanel>
-        {/* DataGrid Salidas temporales */}
-        <CustomTabPanel value={value} index={2}>
-          <div style={{ height: 400, width: "100%" }}>
-            <div
-              style={{
-                display: "flex",
-                height: "75vh",
-                width: "100%",
-                mt: "20cm",
-              }}
-            >
-              <DataGrid
-                rows={rowsAprobados}
-                columns={columns}
-                pageSize={5}
-                autoPageSize
-                rowsPerPageOptions={[5]}
-                getRowId={(row) => row.folio_id}
-                onRowClick={handleClickRow}
-                disableSelectionOnClick
-                sx={{
-                  fontSize: "0.7rem",
-                  "& .MuiDataGrid-cell": { padding: "4px" },
-                  "& .MuiDataGrid-columnHeaders": { fontSize: "0.85rem" },
-                }}
-              />
-            </div>
-          </div>
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={3}>
-          <div style={{ height: 400, width: "100%" }}>
-            <div
-              style={{
-                display: "flex",
-                height: "75vh",
-                width: "100%",
-                mt: "20cm",
-              }}
-            >
-              <DataGrid
-                rows={rowsRechazados}
-                columns={columns}
-                pageSize={5}
-                autoPageSize
-                rowsPerPageOptions={[5]}
-                getRowId={(row) => row.folio_id}
-                onRowClick={handleClickRowTemporales}
-                disableSelectionOnClick
-                sx={{
-                  fontSize: "0.7rem",
-                  "& .MuiDataGrid-cell": { padding: "4px" },
-                  "& .MuiDataGrid-columnHeaders": { fontSize: "0.85rem" },
-                }}
-              />
-            </div>
-          </div>
-        </CustomTabPanel>
-        <CustomTabPanel value={value} index={4}>
-          <div style={{ height: 400, width: "100%" }}>
-            <div
-              style={{
-                display: "flex",
-                height: "75vh",
-                width: "100%",
-                mt: "20cm",
-              }}
-            >
-              <DataGrid
-                rows={roswRetornados}
-                columns={columns}
-                pageSize={5}
-                autoPageSize
-                rowsPerPageOptions={[5]}
-                getRowId={(row) => row.folio_id}
-                onRowClick={handleClickRowTemporales}
-                disableSelectionOnClick
-                sx={{
-                  fontSize: "0.7rem",
-                  "& .MuiDataGrid-cell": { padding: "4px" },
-                  "& .MuiDataGrid-columnHeaders": { fontSize: "0.85rem" },
-                }}
-              />
-            </div>
-          </div>
-        </CustomTabPanel>
+
         {/* Modal Visualizar */}
         <Visualizar
           open={openVisualizar}

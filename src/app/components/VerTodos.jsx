@@ -174,7 +174,25 @@ function VerTodos() {
             </span>
           );
         }
-
+        if (dias < -1000) {
+          return (
+            <span
+              style={{
+                padding: "4px 8px",
+                borderRadius: "4px",
+                fontWeight: "bold",
+                textAlign: "center",
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#555",
+              }}
+            >
+              N/A
+            </span>
+          );
+        }
         // Determinar color según estado
         let color = "";
         let textColor = "#000";

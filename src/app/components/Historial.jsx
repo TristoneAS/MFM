@@ -3,19 +3,18 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
-import { DataGrid } from "@mui/x-data-grid";
-import { Button, Box, Tabs, Tab } from "@mui/material";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import HourglassBottomTwoToneIcon from "@mui/icons-material/HourglassBottomTwoTone";
 import CancelTwoToneIcon from "@mui/icons-material/CancelTwoTone";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import BrowserNotSupportedIcon from "@mui/icons-material/BrowserNotSupported";
+import { DataGrid } from "@mui/x-data-grid";
+import { Button, Box, Tabs, Tab } from "@mui/material";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 import Visualizar from "./Visualizar";
-import Editar from "./Editar";
 
 // ---------------- Custom Tab Panel ----------------
 function CustomTabPanel(props) {
@@ -47,9 +46,271 @@ function a11yProps(index) {
 }
 
 // ---------------- Main Component ----------------
-export default function MisSolicitudes() {
-  const [refresh, setRefresh] = useState(true);
+export default function Historial() {
+  const [emp_id, setEmp_id] = useState(null);
+  const [rowsRevisar, setRowsRevisar] = useState([]);
+  const [rowsRechazados, setRowsRechazados] = useState([]);
+  const [rowsAprobados, setRowsAprobados] = useState([]);
+  const [roswRetornados, setRowsRetornados] = useState([]);
+  const [rowsTemporales, setRowsTemporales] = useState([]);
 
+  const [loading, setLoading] = useState(true);
+
+  const [openVisualizar, setOpenVisualizar] = useState(false);
+  const [folioRows, setFolioRows] = useState([]);
+  const [materialRows, setMaterialRows] = useState([]);
+  const [paqueteriaRows, setPaqueteriaRows] = useState([]);
+  const [idSelected, setIdSelected] = useState(null);
+
+  const [value, setValue] = useState(0);
+  const [ocultarBoton, setOcultarBoton] = useState(false);
+
+  // ---------------- Fetch emp_id ----------------
+  useEffect(() => {
+    const stored = localStorage.getItem("emp_id");
+    if (stored) setEmp_id(stored);
+  }, []);
+
+  // ---------------- Fetch Data ----------------
+  useEffect(() => {
+    if (!emp_id) return;
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        const [revisar, temporales, aprobados, Rechazados, retornados] =
+          await Promise.all([
+            axios.get(`/api/folio_consultas/?emp_id=${emp_id}&Revisar=true`),
+            axios.get(`/api/folio_consultas/?emp_id=${emp_id}&retornos=true`),
+            axios.get(
+              `/api/folio_consultas/?emp_id=${emp_id}&misAprobados=true`
+            ),
+
+            axios.get(
+              `/api/folio_consultas/?emp_id=${emp_id}&misRechazados=true`
+            ),
+            axios.get(
+              `/api/folio_consultas/?emp_id=${emp_id}&misRetornados=true`
+            ),
+          ]);
+
+        if (!isMounted) return;
+
+        setRowsRevisar(revisar.data);
+        setRowsTemporales(temporales.data);
+        setRowsAprobados(aprobados.data);
+        setRowsRechazados(Rechazados.data);
+        setRowsRetornados(retornados.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error al obtener datos:", err);
+      }
+    };
+
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
+  }, [emp_id]);
+
+  // ---------------- Handlers ----------------
+  const handleClickVerFolio = async (folio_id) => {
+    let isMounted = true;
+    try {
+      const [folioRes, materialRes, paqueteriaRes] = await Promise.all([
+        axios.get(`/api/folio_consultas/?folio_id=${folio_id}`),
+        axios.get(`/api/material_consultas/?folio_id=${folio_id}`),
+        axios.get(`/api/paqueteria/?folio_id=${folio_id}`),
+      ]);
+
+      if (!isMounted) return;
+
+      setFolioRows(folioRes.data[0] || []);
+      setMaterialRows(materialRes.data || []);
+      setPaqueteriaRows(paqueteriaRes.data || []);
+      setOpenVisualizar(true);
+    } catch (err) {
+      console.error("Error al obtener folio:", err);
+    }
+  };
+
+  const handleClickRow = (params) => {
+    setIdSelected(params.id);
+    setOcultarBoton(true);
+  };
+  const handleClickRowTemporales = (params) => {
+    setIdSelected(params.id);
+    setOcultarBoton(false);
+  };
+
+  const handleChangeTab = (event, newValue) => {
+    setValue(newValue);
+  };
+
+  if (loading)
+    return (
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    );
+
+  // ---------------- Columns ----------------
+  const columns = [
+    {
+      field: "acciones",
+      headerName: "Acción",
+      flex: 0.8,
+      sortable: false,
+      filterable: false,
+      renderCell: (params) => {
+        const row = params.row;
+
+        return (
+          <>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => handleClickVerFolio(row.folio_id)}
+              style={{
+                marginLeft: 4,
+                minWidth: "36px",
+                padding: "4px",
+              }}
+            >
+              <VisibilityIcon fontSize="small" />
+            </Button>
+          </>
+        );
+      },
+    },
+    { field: "folio_id", headerName: "Folio", flex: 0.3, align: "center" },
+    { field: "fecha", headerName: "Fecha", flex: 1 },
+    { field: "creado_por", headerName: "Requisitor", flex: 2 },
+    { field: "responsable1", headerName: "Aprobador", flex: 2 },
+    {
+      field: "status_1",
+      headerName: "Estado",
+      flex: 0.9,
+      renderCell: (params) => renderEstadoCell(params.value),
+    },
+    { field: "suplente", headerName: "Suplente", flex: 2 },
+    {
+      field: "status_S",
+      headerName: "Estado",
+      flex: 0.9,
+      renderCell: (params) => renderEstadoCell(params.value),
+    },
+    { field: "responsable2", headerName: "Aprobador 2", flex: 2 },
+    {
+      field: "status_2",
+      headerName: "Estado",
+      flex: 1,
+      renderCell: (params) => renderEstadoCell(params.value),
+    },
+    {
+      field: "estado_retorno",
+      headerName: "Dias Restantes",
+      flex: 1.5,
+      renderCell: (params) => {
+        const row = params.row;
+        const dias = row.dias_restantes; // viene de tu consulta SQL
+        const estado = row.estado_retorno; // el estado calculado por SQL
+        const liberado = row.liberado; // tu campo de la base de datos
+        const fecha_regreso = row.fecha_regreso;
+        // Caso especial: si está liberado
+        if (liberado === "true") {
+          return (
+            <span
+              style={{
+                backgroundColor: "#4db6ac", // color azul-verde para liberado
+                color: "#fff",
+                padding: "6px 10px",
+                borderRadius: "4px",
+                fontWeight: "bold",
+                textAlign: "center",
+                width: "100%",
+                display: "flex",
+                flexDirection: "column", // 👈 apilar en columna
+                alignItems: "center",
+                justifyContent: "center",
+                lineHeight: "1.3",
+              }}
+            >
+              <span>Retornado</span>
+              <span style={{ fontSize: "0.9em", fontWeight: "normal" }}>
+                {fecha_regreso}
+              </span>
+            </span>
+          );
+        }
+
+        // Caso especial: si no hay días restantes -> mostrar N/A
+        if (dias === null) {
+          return (
+            <span
+              style={{
+                padding: "4px 8px",
+                borderRadius: "4px",
+                fontWeight: "bold",
+                textAlign: "center",
+                width: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#555",
+              }}
+            >
+              N/A
+            </span>
+          );
+        }
+
+        // Determinar color según estado
+        let color = "";
+        let textColor = "#000";
+
+        switch (estado) {
+          case "Vencido":
+            color = "#FF6A6A"; // rojo
+            textColor = "#fff";
+            break;
+          case "Hoy":
+            color = "#ffb74d"; // naranja
+            textColor = "#fff";
+            break;
+          case "Próximos 5 días":
+            color = "#fff176"; // amarillo
+            textColor = "#000";
+            break;
+          default:
+            color = "#81c784"; // verde
+            textColor = "#fff";
+        }
+
+        return (
+          <span
+            style={{
+              backgroundColor: color,
+              color: textColor,
+              padding: "4px 8px",
+              borderRadius: "4px",
+              fontWeight: "bold",
+              textAlign: "center",
+              width: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            {dias}
+          </span>
+        );
+      },
+    },
+  ];
   const renderEstadoCell = (estado) => {
     let icon = null;
     let color = "";
@@ -91,32 +352,19 @@ export default function MisSolicitudes() {
       </span>
     );
   };
-  // ---------------- States ----------------
-  const [emp_id, setEmp_id] = useState(null);
-  const [rows, setRows] = useState([]);
-  const [rowsEsperando, setRowsEsperando] = useState([]);
-  const [rowsAprobadas, setRowsAprobadas] = useState([]);
-  const [rowsRechazadas, setRowsRechazadas] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [openEditar, setOpenEditar] = useState(false);
-
-  const [openVisualizar, setOpenVisualizar] = useState(false);
-  const [folioRows, setFolioRows] = useState([]);
-  const [materialRows, setMaterialRows] = useState([]);
-  const [paqueteriaRows, setPaqueteriaRows] = useState([]);
-  const [idSelected, setIdSelected] = useState(null);
-  const [ocultarBoton, setOcultarBoton] = useState(false);
-
-  const [value, setValue] = useState(0);
-  const columns = [
+  const columnsTemporales = [
     {
       field: "acciones",
       headerName: "Acción",
-      flex: 1.0,
+      flex: 1.25,
       sortable: false,
       filterable: false,
       renderCell: (params) => {
         const row = params.row;
+        const isResp2 =
+          row.responsable2_id === emp_id ||
+          row.responsable1_id === emp_id ||
+          row.suplente_id === emp_id;
 
         return (
           <>
@@ -132,72 +380,65 @@ export default function MisSolicitudes() {
             >
               <VisibilityIcon fontSize="small" />
             </Button>
+
+            {isResp2 && (
+              <Button
+                variant="contained"
+                size="small"
+                onClick={() => handleLiberarRegistro(row.folio_id)}
+                style={{
+                  marginLeft: 4,
+                  minWidth: "36px",
+                  padding: "4px",
+                  backgroundColor: "#81c784", // verde
+                  color: "#fff",
+                }}
+              >
+                <LockOpenIcon fontSize="small" />
+              </Button>
+            )}
           </>
         );
       },
     },
     { field: "folio_id", headerName: "Folio", flex: 0.3, align: "center" },
-    { field: "fecha", headerName: "Fecha", flex: 1 },
-    { field: "creado_por", headerName: "Requisitor", flex: 2 },
-    { field: "responsable1", headerName: "Aprobador", flex: 2 },
+    { field: "fecha", headerName: "Fecha", flex: 0.9 },
+    { field: "fecha_retorno", headerName: "Retorno", flex: 0.9 },
+    { field: "creado_por", headerName: "Requisitor", flex: 2.8 },
+    { field: "responsable1", headerName: "Aprobador", flex: 2.8 },
     {
       field: "status_1",
       headerName: "Estado",
-      flex: 0.9,
+      flex: 0.7,
       renderCell: (params) => renderEstadoCell(params.value),
     },
-    { field: "suplente", headerName: "Suplente", flex: 2 },
+    { field: "suplente", headerName: "Suplente", flex: 2.8 },
     {
       field: "status_S",
       headerName: "Estado",
-      flex: 0.9,
+      flex: 0.7,
       renderCell: (params) => renderEstadoCell(params.value),
     },
-    { field: "responsable2", headerName: "Aprobador 2", flex: 2 },
+    { field: "responsable2", headerName: "Aprobador 2", flex: 2.8 },
     {
       field: "status_2",
       headerName: "Estado",
-      flex: 1,
+      flex: 0.7,
       renderCell: (params) => renderEstadoCell(params.value),
     },
+
     {
       field: "estado_retorno",
       headerName: "Dias Restantes",
-      flex: 1.5,
+      flex: 1.45,
       renderCell: (params) => {
-        const row = params.row;
-        const dias = row.dias_restantes; // viene de tu consulta SQL
-        const estado = row.estado_retorno; // el estado calculado por SQL
-        const liberado = row.liberado; // tu campo de la base de datos
-        const fecha_regreso = row.fecha_regreso;
-        // Caso especial: si está liberado
-        if (liberado === "true") {
-          return (
-            <span
-              style={{
-                backgroundColor: "#4db6ac", // color azul-verde para liberado
-                color: "#fff",
-                padding: "6px 10px",
-                borderRadius: "4px",
-                fontWeight: "bold",
-                textAlign: "center",
-                width: "100%",
-                display: "flex",
-                flexDirection: "column", // 👈 apilar en columna
-                alignItems: "center",
-                justifyContent: "center",
-                lineHeight: "1.3",
-              }}
-            >
-              <span>Retornado</span>
-              <span style={{ fontSize: "0.9em", fontWeight: "normal" }}>
-                {fecha_regreso}
-              </span>
-            </span>
-          );
-        }
+        console.log("los params son: ", params);
 
-        // Caso especial: si no hay días restantes -> mostrar N/A
+        const row = params.row;
+        const estado = params.value;
+        const dias = row.dias_restantes; // viene de tu consulta SQL
+
+        // Caso especial: si no hay días restantes -> mostrar N/A sin color
         if (dias === null) {
           return (
             <span
@@ -207,29 +448,8 @@ export default function MisSolicitudes() {
                 fontWeight: "bold",
                 textAlign: "center",
                 width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#555",
-              }}
-            >
-              N/A
-            </span>
-          );
-        }
-        if (dias < -1000) {
-          return (
-            <span
-              style={{
-                padding: "4px 8px",
-                borderRadius: "4px",
-                fontWeight: "bold",
-                textAlign: "center",
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#555",
+                display: "inline-block",
+                color: "#555", // gris neutro
               }}
             >
               N/A
@@ -237,7 +457,6 @@ export default function MisSolicitudes() {
           );
         }
 
-        // Determinar color según estado
         let color = "";
         let textColor = "#000";
 
@@ -269,301 +488,54 @@ export default function MisSolicitudes() {
               fontWeight: "bold",
               textAlign: "center",
               width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              display: "inline-block",
             }}
           >
-            {dias}
+            {` ${dias}`}
           </span>
         );
       },
     },
   ];
-  const columnsEdit = [
-    {
-      field: "acciones",
-      headerName: "Acción",
-      flex: 1.0,
-      sortable: false,
-      filterable: false,
-      renderCell: (params) => {
-        const row = params.row;
 
-        return (
-          <>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => handleClickVerFolio(row.folio_id)}
-              style={{
-                marginLeft: 4,
-                minWidth: "36px",
-                padding: "4px",
-              }}
-            >
-              <VisibilityIcon fontSize="small" />
-            </Button>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => handleClickEditarFolio(row.folio_id)}
-              style={{
-                marginLeft: 4,
-                minWidth: "36px",
-                padding: "4px",
-              }}
-            >
-              <ModeEditIcon fontSize="small" />
-            </Button>
-          </>
-        );
-      },
-    },
-    { field: "folio_id", headerName: "Folio", flex: 0.3, align: "center" },
-    { field: "fecha", headerName: "Fecha", flex: 1 },
-    { field: "creado_por", headerName: "Requisitor", flex: 2 },
-    { field: "responsable1", headerName: "Aprobador", flex: 2 },
-    {
-      field: "status_1",
-      headerName: "Estado",
-      flex: 0.9,
-      renderCell: (params) => renderEstadoCell(params.value),
-    },
-    { field: "suplente", headerName: "Suplente", flex: 2 },
-    {
-      field: "status_S",
-      headerName: "Estado",
-      flex: 0.9,
-      renderCell: (params) => renderEstadoCell(params.value),
-    },
-    { field: "responsable2", headerName: "Aprobador 2", flex: 2 },
-    {
-      field: "status_2",
-      headerName: "Estado",
-      flex: 1,
-      renderCell: (params) => renderEstadoCell(params.value),
-    },
-    {
-      field: "estado_retorno",
-      headerName: "Dias Restantes",
-      flex: 1.5,
-      renderCell: (params) => {
-        const row = params.row;
-        const dias = row.dias_restantes; // viene de tu consulta SQL
-        const estado = row.estado_retorno; // el estado calculado por SQL
-        const liberado = row.liberado; // tu campo de la base de datos
-        const fecha_regreso = row.fecha_regreso;
-        // Caso especial: si está liberado
-        if (liberado === "true") {
-          return (
-            <span
-              style={{
-                backgroundColor: "#4db6ac", // color azul-verde para liberado
-                color: "#fff",
-                padding: "6px 10px",
-                borderRadius: "4px",
-                fontWeight: "bold",
-                textAlign: "center",
-                width: "100%",
-                display: "flex",
-                flexDirection: "column", // 👈 apilar en columna
-                alignItems: "center",
-                justifyContent: "center",
-                lineHeight: "1.3",
-              }}
-            >
-              <span>Retornado</span>
-              <span style={{ fontSize: "0.9em", fontWeight: "normal" }}>
-                {fecha_regreso}
-              </span>
-            </span>
-          );
-        }
-
-        // Caso especial: si no hay días restantes -> mostrar N/A
-        if (dias === null) {
-          return (
-            <span
-              style={{
-                padding: "4px 8px",
-                borderRadius: "4px",
-                fontWeight: "bold",
-                textAlign: "center",
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#555",
-              }}
-            >
-              N/A
-            </span>
-          );
-        }
-        if (dias < -1000) {
-          return (
-            <span
-              style={{
-                padding: "4px 8px",
-                borderRadius: "4px",
-                fontWeight: "bold",
-                textAlign: "center",
-                width: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#555",
-              }}
-            >
-              N/A
-            </span>
-          );
-        }
-
-        // Determinar color según estado
-        let color = "";
-        let textColor = "#000";
-
-        switch (estado) {
-          case "Vencido":
-            color = "#FF6A6A"; // rojo
-            textColor = "#fff";
-            break;
-          case "Hoy":
-            color = "#ffb74d"; // naranja
-            textColor = "#fff";
-            break;
-          case "Próximos 5 días":
-            color = "#fff176"; // amarillo
-            textColor = "#000";
-            break;
-          default:
-            color = "#81c784"; // verde
-            textColor = "#fff";
-        }
-
-        return (
-          <span
-            style={{
-              backgroundColor: color,
-              color: textColor,
-              padding: "4px 8px",
-              borderRadius: "4px",
-              fontWeight: "bold",
-              textAlign: "center",
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {dias}
-          </span>
-        );
-      },
-    },
-  ];
-  // ---------------- Fetch emp_id desde localStorage ----------------
-  useEffect(() => {
-    const stored = localStorage.getItem("emp_id");
-    if (stored) setEmp_id(stored);
-  }, []);
-
-  // ---------------- Fetch Data ----------------
-  useEffect(() => {
-    if (!emp_id) return;
-    let isMounted = true;
-
-    const fetchData = async () => {
-      try {
-        const [res, res2, res3] = await Promise.all([
-          axios.get(`/api/folio_consultas/?emp_id=${emp_id}&Esperando=true`),
-          axios.get(`/api/folio_consultas/?emp_id=${emp_id}&Aprobados=true`),
-          axios.get(`/api/folio_consultas/?emp_id=${emp_id}&Rechazados=true`),
-        ]);
-        if (!isMounted) return;
-        console.log("los editados son: ", res.data);
-
-        /*    setRows(res1.data); */
-        setRowsEsperando(res.data);
-        setRowsAprobadas(res2.data);
-        setRowsRechazadas(res3.data);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error al obtener datos:", err);
-      }
-    };
-
-    fetchData();
-    return () => {
-      isMounted = false;
-    };
-  }, [emp_id, refresh]);
-
-  // ---------------- Handlers ----------------
-  const handleClickVerFolio = async (folio_id) => {
-    let isMounted = true;
-    try {
-      const [folioRes, materialRes, paqueteriaRes] = await Promise.all([
-        axios.get(`/api/folio_consultas/?folio_id=${folio_id}`),
-        axios.get(`/api/material_consultas/?folio_id=${folio_id}`),
-        axios.get(`/api/paqueteria/?folio_id=${folio_id}`),
-      ]);
-      if (!isMounted) return;
-
-      setFolioRows(folioRes.data[0] || []);
-      setMaterialRows(materialRes.data || []);
-      setPaqueteriaRows(paqueteriaRes.data || []);
-      setOpenVisualizar(true);
-    } catch (err) {
-      console.error("Error al obtener folio:", err);
-    }
-  };
-  const handleClickEditarFolio = async (folio_id) => {
-    let isMounted = true;
-    try {
-      const [folioRes, materialRes, paqueteriaRes] = await Promise.all([
-        axios.get(`/api/folio_consultas/?folio_id=${folio_id}`),
-        axios.get(`/api/material_consultas/?folio_id=${folio_id}`),
-        axios.get(`/api/paqueteria/?folio_id=${folio_id}`),
-      ]);
-      if (!isMounted) return;
-
-      setFolioRows(folioRes.data[0] || []);
-      setMaterialRows(materialRes.data || []);
-      setPaqueteriaRows(paqueteriaRes.data || []);
-      setOpenEditar(true);
-    } catch (err) {
-      console.error("Error al obtener folio:", err);
-    }
-  };
-  const handleClickRow = (params) => {
-    setIdSelected(params.id);
-    setOcultarBoton(true);
-  };
-
-  const handleClickRowEsperando = (params) => {
-    setIdSelected(params.id);
-    setOcultarBoton(false);
-  };
-
-  const handleChangeTab = (event, newValue) => {
-    setValue(newValue);
-  };
-
-  if (loading)
-    return (
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
-    );
-
-  // ---------------- Styles ----------------
   const StylePestañas = { fontSize: "12px" };
+
+  const handleLiberarRegistro = async (folio_id) => {
+    try {
+      const emp_id = localStorage.getItem("emp_id");
+
+      if (!folio_id) {
+        console.log("Selecciona un folio");
+        return;
+      }
+
+      // Confirmación antes de continuar
+      const confirmar = window.confirm(
+        "¿Seguro que quieres liberar este folio?"
+      );
+      if (!confirmar) return;
+
+      setLoading(true);
+      const hoy = new Date().toISOString().split("T")[0]; // "YYYY-MM-DD"
+
+      await axios.put(`/api/folio/${folio_id}`, {
+        liberar: "true",
+        fecha_regreso: hoy,
+        emp_id: emp_id,
+      });
+
+      const res = await axios.get(
+        `/api/folio_consultas/?emp_id=${emp_id}&retornos=true`
+      );
+
+      setRowsTemporales(res.data);
+      Advertencia(folio_id);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div
@@ -586,15 +558,32 @@ export default function MisSolicitudes() {
           flexDirection: "column",
         }}
       >
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: "divider",
+          }}
+        >
           <Tabs value={value} onChange={handleChangeTab}>
-            <Tab label="Sin aprobar" {...a11yProps(0)} sx={StylePestañas} />
-            <Tab label="Aprobadas" {...a11yProps(1)} sx={StylePestañas} />
-            <Tab label="Rechazadas" {...a11yProps(2)} sx={StylePestañas} />
+            <Tab
+              label="Aprobados por mi"
+              {...a11yProps(0)}
+              sx={StylePestañas}
+            />{" "}
+            <Tab
+              label="Rechazados por mi"
+              {...a11yProps(1)}
+              sx={StylePestañas}
+            />{" "}
+            <Tab
+              label="Retornados por mi"
+              {...a11yProps(2)}
+              sx={StylePestañas}
+            />
           </Tabs>
         </Box>
 
-        {/* DataGrid para Esperando */}
+        {/* DataGrid Salidas temporales */}
         <CustomTabPanel value={value} index={0}>
           <div style={{ height: 400, width: "100%" }}>
             <div
@@ -606,13 +595,13 @@ export default function MisSolicitudes() {
               }}
             >
               <DataGrid
-                rows={rowsEsperando}
-                columns={columnsEdit}
+                rows={rowsAprobados}
+                columns={columns}
                 pageSize={5}
                 autoPageSize
                 rowsPerPageOptions={[5]}
                 getRowId={(row) => row.folio_id}
-                onRowClick={handleClickRowEsperando}
+                onRowClick={handleClickRow}
                 disableSelectionOnClick
                 sx={{
                   fontSize: "0.7rem",
@@ -634,13 +623,13 @@ export default function MisSolicitudes() {
               }}
             >
               <DataGrid
-                rows={rowsAprobadas}
+                rows={rowsRechazados}
                 columns={columns}
                 pageSize={5}
                 autoPageSize
                 rowsPerPageOptions={[5]}
                 getRowId={(row) => row.folio_id}
-                onRowClick={handleClickRowEsperando}
+                onRowClick={handleClickRowTemporales}
                 disableSelectionOnClick
                 sx={{
                   fontSize: "0.7rem",
@@ -652,7 +641,6 @@ export default function MisSolicitudes() {
           </div>
         </CustomTabPanel>
         <CustomTabPanel value={value} index={2}>
-          {" "}
           <div style={{ height: 400, width: "100%" }}>
             <div
               style={{
@@ -663,13 +651,13 @@ export default function MisSolicitudes() {
               }}
             >
               <DataGrid
-                rows={rowsRechazadas}
+                rows={roswRetornados}
                 columns={columns}
                 pageSize={5}
                 autoPageSize
                 rowsPerPageOptions={[5]}
                 getRowId={(row) => row.folio_id}
-                onRowClick={handleClickRowEsperando}
+                onRowClick={handleClickRowTemporales}
                 disableSelectionOnClick
                 sx={{
                   fontSize: "0.7rem",
@@ -680,8 +668,6 @@ export default function MisSolicitudes() {
             </div>
           </div>
         </CustomTabPanel>
-        {/* DataGrid para Aprobar */}
-
         {/* Modal Visualizar */}
         <Visualizar
           open={openVisualizar}
@@ -691,16 +677,7 @@ export default function MisSolicitudes() {
           paqueteriaRows={paqueteriaRows}
           ocultar={ocultarBoton}
           idSelected={idSelected}
-          setRows={setRows}
-        />
-        <Editar
-          open={openEditar}
-          setOpen={setOpenEditar}
-          folioRows={folioRows}
-          materialRows={materialRows}
-          paqueteriaRows={paqueteriaRows}
-          refresh={refresh}
-          setRefresh={setRefresh}
+          setRows={setRowsRevisar}
         />
       </Box>
     </div>

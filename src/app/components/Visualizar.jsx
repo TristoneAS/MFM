@@ -97,7 +97,7 @@ function Visualizar({
       pdf.text(`Página ${i} de ${totalPages}`, pdfWidth - 40, pdfHeight - 10);
     }
 
-    pdf.save(`Folio_${folioRows.folio_id}.pdf`);
+    pdf.save(`Salida de material folio ${folioRows.folio_id}.pdf`);
   };
 
   console.log(folioRows);
@@ -899,6 +899,8 @@ function Visualizar({
                     variant="standard"
                     value={folioRows?.creado_por || ""}
                     InputProps={{
+                      readOnly: true,
+
                       sx: { fontSize: "0.78rem" },
                     }}
                     sx={{ width: "230px" }}
@@ -915,6 +917,8 @@ function Visualizar({
                   variant="standard"
                   value={folioRows?.responsable1 || ""}
                   InputProps={{
+                    readOnly: true,
+
                     sx: { fontSize: "0.78rem" },
                   }}
                   sx={{ width: "235px" }}
@@ -937,6 +941,8 @@ function Visualizar({
                   variant="standard"
                   value={folioRows?.suplente || ""}
                   InputProps={{
+                    readOnly: true,
+
                     sx: { fontSize: "0.78rem" },
                   }}
                   sx={{ width: "235px" }}
@@ -958,7 +964,7 @@ function Visualizar({
                   name="responsable2"
                   variant="standard"
                   value={folioRows?.responsable2 || ""}
-                  InputProps={{ sx: { fontSize: "0.78rem" } }}
+                  InputProps={{ readOnly: true, sx: { fontSize: "0.78rem" } }}
                   sx={{ width: "235px" }}
                 />
                 {espera.ap2 && <HourglassBottomTwoToneIcon />}
@@ -979,7 +985,7 @@ function Visualizar({
                   name="recibidoPor"
                   variant="standard"
                   value={""}
-                  InputProps={{ sx: { fontSize: "0.78rem" } }}
+                  InputProps={{ readOnly: true, sx: { fontSize: "0.78rem" } }}
                   sx={{ width: "225px" }}
                 />
               </Box>

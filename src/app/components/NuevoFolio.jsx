@@ -258,6 +258,7 @@ function NuevoFolio() {
         .get(`/api/tipo_material/?tipo_material=${tipo_materialSelected}`)
         .then((response) => {
           const data = response.data[0];
+          console.log("La data es: ", data);
           setResponsable1(data.responsable1);
           setSuplente(data.suplente);
           setResponsable2(data.responsable2);
@@ -286,6 +287,7 @@ function NuevoFolio() {
         responsable2: "",
       }));
     }
+    console.log("El nuevo folio es: ", folio);
   }, [tipo_materialSelected]);
 
   const handleChangetipo_material = (event) => {
