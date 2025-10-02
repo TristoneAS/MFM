@@ -40,6 +40,7 @@ export default function NavBar() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
   const { name, setName } = useContext(DataContext);
+  const [title, setTitle] = useState("");
   const router = useRouter();
 
   const handleClick = (event) => {
@@ -53,13 +54,22 @@ export default function NavBar() {
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
-
+  useEffect(() => {
+    const titulo = localStorage.getItem("titulo");
+    if (title === "") {
+      setTitle(titulo);
+    }
+  }, [title]);
   const handleClickNavegar = (key) => {
     let lowerKey = key.toLowerCase().replace(/ /g, "");
     if (lowerKey === "dashboard") {
       router.push("/dashboard");
     } else {
       router.push(`/dashboard/${lowerKey}`);
+      setTimeout(() => {
+        setTitle(key);
+        localStorage.setItem("titulo", key);
+      }, 500);
     }
   };
 
@@ -171,11 +181,21 @@ export default function NavBar() {
             >
               <MenuIcon />
             </IconButton>
+
             <Typography
-              variant="h6"
+              variant="h4" // Puedes probar con "h4" o "h6"
               component="div"
-              sx={{ flexGrow: 1 }}
-            ></Typography>
+              sx={{
+                flexGrow: 1,
+                textAlign: "center", // Centrado
+                fontFamily: "'Playfair Display', serif", // Fuente más formal
+                fontWeight: "bold", // Negrita elegante
+                letterSpacing: "0.5px", // Espaciado entre letras
+              }}
+            >
+              {title}
+            </Typography>
+
             <IconButton
               onClick={handleClick}
               color="inherit"
@@ -183,6 +203,7 @@ export default function NavBar() {
             >
               <AccountCircleIcon />
             </IconButton>
+
             <Menu
               anchorEl={anchorEl}
               open={Boolean(anchorEl)}
@@ -224,7 +245,7 @@ export default function NavBar() {
 
               <Divider />
 
-              <MenuItem onClick={handleClose}>
+              {/*   <MenuItem onClick={handleClose}>
                 <ListItemIcon>
                   <PersonIcon fontSize="small" />
                 </ListItemIcon>
@@ -235,7 +256,7 @@ export default function NavBar() {
                   <SettingsIcon fontSize="small" />
                 </ListItemIcon>
                 Configuración
-              </MenuItem>
+              </MenuItem> */}
               <MenuItem onClick={handleClickCerrarSesion}>
                 <ListItemIcon>
                   <LogoutIcon fontSize="small" />

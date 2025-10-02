@@ -83,6 +83,7 @@ export function Formulario() {
 
           setTimeout(() => {
             router.push("/dashboard/nuevofolio");
+            localStorage.setItem("titulo", "Nuevo Folio");
           }, 500);
         } else {
           setSnackbarMessage(

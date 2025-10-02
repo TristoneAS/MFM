@@ -398,40 +398,52 @@ function Visualizar({
                     sx={{
                       "& .MuiTableRow-root": {
                         "& .MuiTableCell-root": {
-                          py: 0.2, // 👈 padding vertical mínimo
-                          fontSize: "0.75rem", // más compacto
+                          py: 0.2,
+                          fontSize: "0.75rem",
                         },
                       },
                       "& .MuiTableRow-root:first-of-type .MuiTableCell-root": {
                         fontWeight: "bold",
                         color: "#fff",
                         backgroundColor: "rgb(0,66,105)",
-                        py: 0.25, // encabezado un poquito más
+                        py: 0.25,
                       },
                     }}
                   >
                     {/* Encabezado */}
                     <TableRow>
-                      <TableCell colSpan={2}>Origen:</TableCell>
+                      <TableCell colSpan={3}>Origen:</TableCell>
                     </TableRow>
 
                     {/* Filas de datos */}
                     <TableRow>
                       <TableCell>Ubicacion:</TableCell>
-                      <TableCell>{folioRows?.origen_location || "-"}</TableCell>
+                      <TableCell colSpan={2}>
+                        {folioRows?.origen_location || "-"}
+                      </TableCell>
                     </TableRow>
+
                     <TableRow>
                       <TableCell>Dirección:</TableCell>
-                      <TableCell>
+                      <TableCell colSpan={2}>
                         {folioRows?.origen_direccion || "-"}
                       </TableCell>
                     </TableRow>
+
                     <TableRow>
                       <TableCell>Contacto:</TableCell>
-                      <TableCell>{folioRows?.origen_contacto || "-"}</TableCell>
+                      <TableCell colSpan={2}>
+                        {folioRows?.origen_contacto || "-"}
+                      </TableCell>
+                    </TableRow>
+
+                    {/* Teléfono / Email en una fila con 2 columnas de datos */}
+                    <TableRow>
+                      <TableCell>Teléfono:</TableCell>
+                      <TableCell>{folioRows?.origen_tel || "-"}</TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Tel & Email:</TableCell>
+                      <TableCell>Correo:</TableCell>
                       <TableCell>{folioRows?.origen_correo || "-"}</TableCell>
                     </TableRow>
                   </TableBody>
@@ -493,7 +505,11 @@ function Visualizar({
                       </TableCell>
                     </TableRow>
                     <TableRow>
-                      <TableCell>Tel & Email:</TableCell>
+                      <TableCell>Teléfono:</TableCell>
+                      <TableCell>{folioRows?.destino_tel || "-"}</TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Correo:</TableCell>
                       <TableCell>{folioRows?.destino_correo || "-"}</TableCell>
                     </TableRow>
                   </TableBody>
@@ -900,7 +916,7 @@ function Visualizar({
                     value={folioRows?.creado_por || ""}
                     InputProps={{
                       readOnly: true,
-
+                      disableUnderline: true,
                       sx: { fontSize: "0.78rem" },
                     }}
                     sx={{ width: "230px" }}
@@ -918,7 +934,7 @@ function Visualizar({
                   value={folioRows?.responsable1 || ""}
                   InputProps={{
                     readOnly: true,
-
+                    disableUnderline: true,
                     sx: { fontSize: "0.78rem" },
                   }}
                   sx={{ width: "235px" }}
@@ -942,7 +958,7 @@ function Visualizar({
                   value={folioRows?.suplente || ""}
                   InputProps={{
                     readOnly: true,
-
+                    disableUnderline: true,
                     sx: { fontSize: "0.78rem" },
                   }}
                   sx={{ width: "235px" }}
@@ -964,7 +980,11 @@ function Visualizar({
                   name="responsable2"
                   variant="standard"
                   value={folioRows?.responsable2 || ""}
-                  InputProps={{ readOnly: true, sx: { fontSize: "0.78rem" } }}
+                  InputProps={{
+                    readOnly: true,
+                    disableUnderline: true,
+                    sx: { fontSize: "0.78rem" },
+                  }}
                   sx={{ width: "235px" }}
                 />
                 {espera.ap2 && <HourglassBottomTwoToneIcon />}

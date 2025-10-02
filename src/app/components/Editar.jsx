@@ -144,10 +144,12 @@ function Editar({
     origen_direccion: "",
     origen_contacto: "",
     origen_correo: "",
+    origen_tel: "",
     destino_location: "",
     destino_direccion: "",
     destino_contacto: "",
     destino_correo: "",
+    destino_tel: "",
     documento: "",
     sello: "",
     transportista: "",
@@ -838,10 +840,12 @@ function Editar({
   useEffect(() => {
     let origen_location = folio.origen_location !== "" ? 6 : 0;
     let origen_contacto = folio.origen_contacto !== "" ? 6 : 0;
-    let origen_correo = folio.origen_correo !== "" ? 6 : 0;
+    let origen_correo = folio.origen_correo !== "" ? 3 : 0;
+    let origen_tel = folio.origen_tel !== "" ? 3 : 0;
     let destino_location = folio.destino_location !== "" ? 6 : 0;
     let destino_contacto = folio.destino_contacto !== "" ? 6 : 0;
-    let destino_correo = folio.destino_correo !== "" ? 6 : 0;
+    let destino_correo = folio.destino_correo !== "" ? 3 : 0;
+    let destino_tel = folio.destino_tel !== "" ? 3 : 0;
     let sello = folio.sello !== "" ? 5 : 0;
     let transportista = folio.transportista !== "" ? 5 : 0;
     let modo_envio = folio.modo_envio !== "" ? 5 : 0;
@@ -858,9 +862,11 @@ function Editar({
       Number(origen_location) +
         Number(origen_contacto) +
         Number(origen_correo) +
+        Number(origen_tel) +
         Number(destino_location) +
         Number(destino_contacto) +
         Number(destino_correo) +
+        Number(destino_tel) +
         Number(sello) +
         Number(transportista) +
         Number(modo_envio) +
@@ -878,9 +884,13 @@ function Editar({
     folio.origen_location,
     folio.origen_contacto,
     folio.origen_correo,
+    folio.origen_tel,
+
     folio.destino_location,
     folio.destino_contacto,
     folio.destino_correo,
+    folio.destino_tel,
+
     folio.sello,
     folio.transportista,
     folio.modo_envio,
@@ -1127,10 +1137,6 @@ function Editar({
                       backgroundColor: "#fafafa",
                       boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                       transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                      "&:hover": {
-                        transform: "translateY(-4px)",
-                        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                      },
                     }}
                   >
                     <Typography
@@ -1140,13 +1146,13 @@ function Editar({
                       Origen
                     </Typography>
 
-                    <FormControl fullWidth>
-                      <InputLabel>Origen Location</InputLabel>
+                    <FormControl fullWidth size="small" variant="outlined">
                       <InputLabel id="origen-label">Origen Location</InputLabel>
                       <Select
                         labelId="origen-label"
                         value={locacionSelectedOrigen}
                         onChange={handleChangeLocacionOrigen}
+                        label="Origen Location"
                       >
                         {locacionesOrigen.map((loc) => (
                           <MenuItem key={loc.id} value={loc.id}>
@@ -1180,20 +1186,40 @@ function Editar({
                       fullWidth
                     />
 
-                    <TextField
-                      label="Tel & Email"
-                      name="origen_correo"
-                      variant="outlined"
-                      size="small"
-                      value={folio.origen_correo}
-                      slotProps={{
-                        input: {
-                          inputProps: { maxLength: 99 },
-                        },
-                      }}
-                      onChange={handleChangeSetFolio}
-                      fullWidth
-                    />
+                    <Box sx={{ display: "flex", gap: 2 }}>
+                      <TextField
+                        label="Teléfono"
+                        name="origen_tel"
+                        variant="outlined"
+                        size="small"
+                        value={folio.origen_tel}
+                        inputProps={{ maxLength: 10 }}
+                        onChange={(e) => {
+                          const numericValue = e.target.value
+                            .replace(/\D/g, "")
+                            .slice(0, 10);
+                          handleChangeSetFolio({
+                            target: {
+                              name: e.target.name,
+                              value: numericValue,
+                            },
+                          });
+                        }}
+                        fullWidth
+                      />
+
+                      <TextField
+                        label="Email"
+                        name="origen_correo"
+                        variant="outlined"
+                        size="small"
+                        type="email"
+                        value={folio.origen_correo}
+                        inputProps={{ maxLength: 99 }}
+                        onChange={handleChangeSetFolio}
+                        fullWidth
+                      />
+                    </Box>
                   </Paper>
 
                   {/* CARD DESTINO */}
@@ -1210,10 +1236,6 @@ function Editar({
                       backgroundColor: "#fafafa",
                       boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                       transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                      "&:hover": {
-                        transform: "translateY(-4px)",
-                        boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                      },
                     }}
                   >
                     <Typography
@@ -1223,8 +1245,7 @@ function Editar({
                       Destino
                     </Typography>
 
-                    <FormControl fullWidth>
-                      <InputLabel>Destino Location</InputLabel>
+                    <FormControl fullWidth size="small" variant="outlined">
                       <InputLabel id="destino-label">
                         Destino Location
                       </InputLabel>
@@ -1232,6 +1253,7 @@ function Editar({
                         labelId="destino-label"
                         value={locacionSelected}
                         onChange={handleChangeLocacion}
+                        label="Destino Location" // 👈 clave para que no se traslape
                       >
                         {locaciones.map((loc) => (
                           <MenuItem key={loc.id} value={loc.id}>
@@ -1265,20 +1287,40 @@ function Editar({
                       fullWidth
                     />
 
-                    <TextField
-                      label="Tel & Email"
-                      name="destino_correo"
-                      variant="outlined"
-                      size="small"
-                      value={folio.destino_correo}
-                      slotProps={{
-                        input: {
-                          inputProps: { maxLength: 99 },
-                        },
-                      }}
-                      onChange={handleChangeSetFolio}
-                      fullWidth
-                    />
+                    <Box sx={{ display: "flex", gap: 2 }}>
+                      <TextField
+                        label="Teléfono"
+                        name="destino_tel"
+                        variant="outlined"
+                        size="small"
+                        value={folio.destino_tel}
+                        inputProps={{ maxLength: 10 }}
+                        onChange={(e) => {
+                          const numericValue = e.target.value
+                            .replace(/\D/g, "")
+                            .slice(0, 10);
+                          handleChangeSetFolio({
+                            target: {
+                              name: e.target.name,
+                              value: numericValue,
+                            },
+                          });
+                        }}
+                        fullWidth
+                      />
+
+                      <TextField
+                        label="Email"
+                        name="destino_correo"
+                        variant="outlined"
+                        size="small"
+                        type="email"
+                        value={folio.destino_correo}
+                        inputProps={{ maxLength: 99 }}
+                        onChange={handleChangeSetFolio}
+                        fullWidth
+                      />
+                    </Box>
                   </Paper>
                 </div>
               </CustomTabPanel>
@@ -1296,10 +1338,6 @@ function Editar({
                     backgroundColor: "#fafafa",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                    },
                   }}
                 >
                   {/* Título */}
@@ -1331,8 +1369,7 @@ function Editar({
                     />
 
                     {/* TRANSPORTISTA */}
-                    <FormControl fullWidth size="small">
-                      <InputLabel>Transportista</InputLabel>
+                    <FormControl fullWidth size="small" variant="outlined">
                       <InputLabel id="transportista-label">
                         Transportista
                       </InputLabel>
@@ -1340,6 +1377,7 @@ function Editar({
                         labelId="transportista-label"
                         value={selectedTransportista}
                         onChange={handleChangeTransportista}
+                        label="Transportista" // 👈 evita el traslape
                       >
                         {transportistas.map((t) => (
                           <MenuItem key={t.id} value={t.transportista}>
@@ -1348,6 +1386,7 @@ function Editar({
                         ))}
                       </Select>
                     </FormControl>
+
                     {/* MODO ENVÍO */}
                     <FormControl fullWidth size="small">
                       <InputLabel>Modo Envío</InputLabel>
@@ -1440,10 +1479,6 @@ function Editar({
                     backgroundColor: "#fafafa",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                    },
                   }}
                 >
                   {/* Título */}
@@ -1478,10 +1513,15 @@ function Editar({
                         type="date"
                         size="small"
                         variant="outlined"
-                        value={folio.fecha_retorno}
-                        onChange={(e) =>
-                          setFolio({ ...folio, fecha_retorno: e.target.value })
+                        value={
+                          folio.fecha_retorno
+                            ? folio.fecha_retorno.split("T")[0] // Mostrar solo YYYY-MM-DD
+                            : ""
                         }
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setFolio({ ...folio, fecha_retorno: value });
+                        }}
                         label="Fecha de Retorno"
                         InputLabelProps={{ shrink: true }}
                         fullWidth
@@ -1489,12 +1529,13 @@ function Editar({
                     )}
 
                     {/* COST CENTER */}
-                    <FormControl fullWidth size="small">
-                      <InputLabel>Cost Center</InputLabel>
+                    <FormControl fullWidth size="small" variant="outlined">
+                      <InputLabel id="costcenter-label">Cost Center</InputLabel>
                       <Select
                         labelId="costcenter-label"
                         value={costCenterSelected}
                         onChange={handleChangeCostCenter}
+                        label="Cost Center" // 👈 evita el traslape
                       >
                         {costCenter.map((m) => (
                           <MenuItem key={m.id} value={m.cost_center}>
@@ -1523,7 +1564,6 @@ function Editar({
                         onChange={handleChangeCaT}
                         label="Categoría"
                       >
-                        <MenuItem value="Seleccionar">Seleccionar</MenuItem>
                         <MenuItem value="Mpo">Mpo</MenuItem>
                         <MenuItem value="Capex">Capex</MenuItem>
                         <MenuItem value="Otros">Otros</MenuItem>
@@ -1562,10 +1602,6 @@ function Editar({
                     backgroundColor: "#fafafa",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                    },
                   }}
                 >
                   <div style={{ height: 300, width: "100%" }}>
@@ -1645,10 +1681,6 @@ function Editar({
                     backgroundColor: "#fafafa",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                    },
                   }}
                 >
                   <div style={{ height: 300, width: "100%" }}>
@@ -1728,10 +1760,6 @@ function Editar({
                     backgroundColor: "#fafafa",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                    },
                   }}
                 >
                   <Typography

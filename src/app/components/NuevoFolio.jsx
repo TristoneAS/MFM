@@ -384,7 +384,8 @@ function NuevoFolio() {
   };
 
   const [valor, setValor] = useState(""); //Para temporal o definitivo
-  const [valor2, setValor2] = useState(""); //Para Categoria
+  const [valor2, setValor2] = useState("");
+  //Para Categoria
   const [openModal, setOpenModal] = useState(false); //Para abrir el modal de agregar material
   const [totales, setTotales] = useState({
     cantidad: 0,
@@ -726,10 +727,12 @@ function NuevoFolio() {
     origen_direccion: "",
     origen_contacto: "",
     origen_correo: "",
+    origen_tel: "",
     destino_location: "",
     destino_direccion: "",
     destino_contacto: "",
     destino_correo: "",
+    destino_tel: "",
     documento: "",
     sello: "",
     transportista: "",
@@ -762,10 +765,12 @@ function NuevoFolio() {
   useEffect(() => {
     let origen_location = folio.origen_location !== "" ? 6 : 0;
     let origen_contacto = folio.origen_contacto !== "" ? 6 : 0;
-    let origen_correo = folio.origen_correo !== "" ? 6 : 0;
+    let origen_correo = folio.origen_correo !== "" ? 3 : 0;
+    let origen_tel = folio.origen_tel !== "" ? 3 : 0;
     let destino_location = folio.destino_location !== "" ? 6 : 0;
     let destino_contacto = folio.destino_contacto !== "" ? 6 : 0;
-    let destino_correo = folio.destino_correo !== "" ? 6 : 0;
+    let destino_correo = folio.destino_correo !== "" ? 3 : 0;
+    let destino_tel = folio.destino_tel !== "" ? 3 : 0;
     let sello = folio.sello !== "" ? 5 : 0;
     let transportista = folio.transportista !== "" ? 5 : 0;
     let modo_envio = folio.modo_envio !== "" ? 5 : 0;
@@ -782,9 +787,11 @@ function NuevoFolio() {
       Number(origen_location) +
         Number(origen_contacto) +
         Number(origen_correo) +
+        Number(origen_tel) +
         Number(destino_location) +
         Number(destino_contacto) +
         Number(destino_correo) +
+        Number(destino_tel) +
         Number(sello) +
         Number(transportista) +
         Number(modo_envio) +
@@ -802,9 +809,11 @@ function NuevoFolio() {
     folio.origen_location,
     folio.origen_contacto,
     folio.origen_correo,
+    folio.origen_tel,
     folio.destino_location,
     folio.destino_contacto,
     folio.destino_correo,
+    folio.destino_tel,
     folio.sello,
     folio.transportista,
     folio.modo_envio,
@@ -1396,10 +1405,6 @@ function NuevoFolio() {
                     backgroundColor: "#fafafa",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                    },
                   }}
                 >
                   <Typography
@@ -1448,7 +1453,7 @@ function NuevoFolio() {
                     fullWidth
                   />
 
-                  <TextField
+                  {/*  <TextField
                     label="Tel & Email"
                     name="origen_correo"
                     variant="outlined"
@@ -1461,7 +1466,38 @@ function NuevoFolio() {
                     }}
                     onChange={handleChangeSetFolio}
                     fullWidth
-                  />
+                  /> */}
+                  <Box sx={{ display: "flex", gap: 2 }}>
+                    <TextField
+                      label="Teléfono"
+                      name="origen_tel"
+                      variant="outlined"
+                      size="small"
+                      value={folio.origen_tel}
+                      inputProps={{ maxLength: 10 }}
+                      onChange={(e) => {
+                        const numericValue = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 10);
+                        handleChangeSetFolio({
+                          target: { name: e.target.name, value: numericValue },
+                        });
+                      }}
+                      fullWidth
+                    />
+
+                    <TextField
+                      label="Email"
+                      name="origen_correo"
+                      variant="outlined"
+                      size="small"
+                      type="email"
+                      value={folio.origen_correo}
+                      inputProps={{ maxLength: 99 }}
+                      onChange={handleChangeSetFolio}
+                      fullWidth
+                    />
+                  </Box>
                 </Paper>
 
                 {/* CARD DESTINO */}
@@ -1478,10 +1514,6 @@ function NuevoFolio() {
                     backgroundColor: "#fafafa",
                     boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                     transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                    "&:hover": {
-                      transform: "translateY(-4px)",
-                      boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                    },
                   }}
                 >
                   <Typography
@@ -1530,7 +1562,7 @@ function NuevoFolio() {
                     fullWidth
                   />
 
-                  <TextField
+                  {/* <TextField
                     label="Tel & Email"
                     name="destino_correo"
                     variant="outlined"
@@ -1543,7 +1575,38 @@ function NuevoFolio() {
                     }}
                     onChange={handleChangeSetFolio}
                     fullWidth
-                  />
+                  /> */}
+                  <Box sx={{ display: "flex", gap: 2 }}>
+                    <TextField
+                      label="Teléfono"
+                      name="destino_tel"
+                      variant="outlined"
+                      size="small"
+                      value={folio.destino_tel}
+                      inputProps={{ maxLength: 10 }}
+                      onChange={(e) => {
+                        const numericValue = e.target.value
+                          .replace(/\D/g, "")
+                          .slice(0, 10);
+                        handleChangeSetFolio({
+                          target: { name: e.target.name, value: numericValue },
+                        });
+                      }}
+                      fullWidth
+                    />
+
+                    <TextField
+                      label="Email"
+                      name="destino_correo"
+                      variant="outlined"
+                      size="small"
+                      type="email"
+                      value={folio.destino_correo}
+                      inputProps={{ maxLength: 99 }}
+                      onChange={handleChangeSetFolio}
+                      fullWidth
+                    />
+                  </Box>
                 </Paper>
               </div>
             </CustomTabPanel>
@@ -1561,10 +1624,6 @@ function NuevoFolio() {
                   backgroundColor: "#fafafa",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                   transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                  },
                 }}
               >
                 {/* Título */}
@@ -1700,10 +1759,6 @@ function NuevoFolio() {
                   backgroundColor: "#fafafa",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                   transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                  },
                 }}
               >
                 {/* Título */}
@@ -1736,13 +1791,20 @@ function NuevoFolio() {
                       type="date"
                       size="small"
                       variant="outlined"
-                      value={folio.fecha_retorno}
-                      onChange={(e) =>
-                        setFolio({ ...folio, fecha_retorno: e.target.value })
-                      }
+                      value={folio.fecha_retorno || ""}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        // Validamos que sea una fecha válida o lo dejamos vacío
+                        if (!value || /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                          setFolio({ ...folio, fecha_retorno: value });
+                        }
+                      }}
                       label="Fecha de Retorno"
                       InputLabelProps={{ shrink: true }}
                       fullWidth
+                      inputProps={{
+                        pattern: "\\d{4}-\\d{2}-\\d{2}", // Permite escribir en formato yyyy-mm-dd
+                      }}
                     />
                   )}
 
@@ -1781,7 +1843,6 @@ function NuevoFolio() {
                       onChange={handleChangeCaT}
                       label="Categoría"
                     >
-                      <MenuItem value="Seleccionar">Seleccionar</MenuItem>
                       <MenuItem value="Mpo">Mpo</MenuItem>
                       <MenuItem value="Capex">Capex</MenuItem>
                       <MenuItem value="Otros">Otros</MenuItem>
@@ -1820,10 +1881,6 @@ function NuevoFolio() {
                   backgroundColor: "#fafafa",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                   transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                  },
                 }}
               >
                 <div style={{ height: 300, width: "100%" }}>
@@ -1900,10 +1957,6 @@ function NuevoFolio() {
                   backgroundColor: "#fafafa",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                   transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                  },
                 }}
               >
                 <div style={{ height: 300, width: "100%" }}>
@@ -1983,10 +2036,6 @@ function NuevoFolio() {
                   backgroundColor: "#fafafa",
                   boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
                   transition: "transform 0.2s ease, box-shadow 0.2s ease",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                  },
                 }}
               >
                 <Typography
