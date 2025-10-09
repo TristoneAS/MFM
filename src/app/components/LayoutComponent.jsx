@@ -183,17 +183,17 @@ export default function NavBar() {
             </IconButton>
 
             <Typography
-              variant="h4" // Puedes probar con "h4" o "h6"
+              variant="h5"
               component="div"
               sx={{
                 flexGrow: 1,
-                textAlign: "center", // Centrado
-                fontFamily: "'Playfair Display', serif", // Fuente más formal
-                fontWeight: "bold", // Negrita elegante
-                letterSpacing: "0.5px", // Espaciado entre letras
+                fontfamily: " Arial, Helvetica, sans-serif",
+
+                letterSpacing: "0.5px",
               }}
             >
-              {title}
+              {/*  {title} */}
+              MATERIAL FLOW MANAGER
             </Typography>
 
             <IconButton

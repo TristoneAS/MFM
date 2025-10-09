@@ -218,7 +218,9 @@ function Visualizar({
         setOpen(false);
 
         setLoading(true);
-        const res = await axios.get(`/api/folio_consultas/?emp_id=${emp_id}`);
+        const res = await axios.get(
+          `/api/folio_consultas/?emp_id=${emp_id}&Revisar=true`
+        );
         setRows(res.data);
         setTimeout(() => {
           Success(idSelected);
@@ -244,7 +246,9 @@ function Visualizar({
         setOpen(false);
 
         setLoading(true);
-        const res = await axios.get(`/api/folio_consultas/?emp_id=${emp_id}`);
+        const res = await axios.get(
+          `/api/folio_consultas/?emp_id=${emp_id}&Revisar=true`
+        );
         setRows(res.data);
         setTimeout(() => {
           Advertencia(idSelected);
@@ -1004,9 +1008,20 @@ function Visualizar({
                 <TextField
                   name="recibidoPor"
                   variant="standard"
-                  value={""}
-                  InputProps={{ readOnly: true, sx: { fontSize: "0.78rem" } }}
-                  sx={{ width: "225px" }}
+                  value=""
+                  InputProps={{
+                    readOnly: true,
+                    disableUnderline: true, // quitamos el underline estándar
+                    sx: {
+                      fontSize: "0.78rem",
+                    },
+                  }}
+                  sx={{
+                    width: "225px",
+                    "& .MuiInputBase-root": {
+                      borderBottom: "1px dashed rgba(0, 0, 0, 0.6)", // línea punteada
+                    },
+                  }}
                 />
               </Box>
             </div>{" "}

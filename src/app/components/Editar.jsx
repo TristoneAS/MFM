@@ -801,6 +801,7 @@ function Editar({
   //Folios
   const handleClickGuardarFolio = async () => {
     try {
+      setLoading(true);
       await axios.put(`/api/folio_edit/${folioRows.folio_id}`, folio);
 
       // Actualizar materiales
@@ -824,14 +825,13 @@ function Editar({
       }
 
       Success(folioRows.folio_id);
-      setLoading(true);
 
       setTimeout(() => {
         setLoading(false);
         setOpen(false);
         setRefresh(!refresh);
-        router.push("/dashboard/missolicitudes"); // 👈 mejor navegar que recargar
-      }, 2000);
+        router.push("/dashboard/missolicitudes");
+      }, 10);
     } catch (error) {
       console.error("Error: ", error);
     }
@@ -1025,7 +1025,7 @@ function Editar({
               position="relative"
               display="inline-flex"
               marginTop={"0.11cm"}
-              marginLeft={"0.11cm"}
+              marginLeft={"0.51cm"}
               alignItems={"center"}
               justifyContent={"center"}
             >
@@ -1214,10 +1214,22 @@ function Editar({
                         variant="outlined"
                         size="small"
                         type="email"
-                        value={folio.origen_correo}
+                        value={folio?.origen_correo || ""}
                         inputProps={{ maxLength: 99 }}
                         onChange={handleChangeSetFolio}
                         fullWidth
+                        error={
+                          folio?.origen_correo &&
+                          folio.origen_correo !== "" &&
+                          !folio.origen_correo.includes("@")
+                        }
+                        helperText={
+                          folio?.origen_correo &&
+                          folio.origen_correo !== "" &&
+                          !folio.origen_correo.includes("@")
+                            ? "El correo no es válido!"
+                            : ""
+                        }
                       />
                     </Box>
                   </Paper>
@@ -1311,14 +1323,26 @@ function Editar({
 
                       <TextField
                         label="Email"
-                        name="destino_correo"
+                        name="origen_correo"
                         variant="outlined"
                         size="small"
                         type="email"
-                        value={folio.destino_correo}
+                        value={folio?.destino_correo || ""}
                         inputProps={{ maxLength: 99 }}
                         onChange={handleChangeSetFolio}
                         fullWidth
+                        error={
+                          folio?.destino_correo &&
+                          folio.destino_correo !== "" &&
+                          !folio.destino_correo.includes("@")
+                        }
+                        helperText={
+                          folio?.destino_correo &&
+                          folio.destino_correo !== "" &&
+                          !folio.destino_correo.includes("@")
+                            ? "El correo no es válido!"
+                            : ""
+                        }
                       />
                     </Box>
                   </Paper>
@@ -1522,6 +1546,7 @@ function Editar({
                           const value = e.target.value;
                           setFolio({ ...folio, fecha_retorno: value });
                         }}
+                        onClick={(e) => e.target.showPicker?.()}
                         label="Fecha de Retorno"
                         InputLabelProps={{ shrink: true }}
                         fullWidth

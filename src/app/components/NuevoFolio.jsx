@@ -685,6 +685,8 @@ function NuevoFolio() {
   //Folios
   const handleClickGuardarFolio = async () => {
     try {
+      setLoading(true);
+
       const resultado = await axios.post("/api/folio/", folio);
       const nuevasRows = [];
       for (let i = 0; i < rows.length; i++) {
@@ -712,7 +714,6 @@ function NuevoFolio() {
       }
 
       Success(resultado.data.id);
-      setLoading(true);
       setTimeout(() => {
         router.push("/dashboard/missolicitudes");
       }, 4000);
@@ -765,11 +766,13 @@ function NuevoFolio() {
   useEffect(() => {
     let origen_location = folio.origen_location !== "" ? 6 : 0;
     let origen_contacto = folio.origen_contacto !== "" ? 6 : 0;
-    let origen_correo = folio.origen_correo !== "" ? 3 : 0;
+    let origen_correo =
+      folio.origen_correo !== "" && folio.origen_correo.includes("@") ? 3 : 0;
     let origen_tel = folio.origen_tel !== "" ? 3 : 0;
     let destino_location = folio.destino_location !== "" ? 6 : 0;
     let destino_contacto = folio.destino_contacto !== "" ? 6 : 0;
-    let destino_correo = folio.destino_correo !== "" ? 3 : 0;
+    let destino_correo =
+      folio.destino_correo !== "" && folio.destino_correo.includes("@") ? 3 : 0;
     let destino_tel = folio.destino_tel !== "" ? 3 : 0;
     let sello = folio.sello !== "" ? 5 : 0;
     let transportista = folio.transportista !== "" ? 5 : 0;
@@ -1496,6 +1499,16 @@ function NuevoFolio() {
                       inputProps={{ maxLength: 99 }}
                       onChange={handleChangeSetFolio}
                       fullWidth
+                      error={
+                        folio.origen_correo !== "" &&
+                        !folio.origen_correo.includes("@")
+                      }
+                      helperText={
+                        folio.origen_correo !== "" &&
+                        !folio.origen_correo.includes("@")
+                          ? "El correo no es valido!"
+                          : ""
+                      }
                     />
                   </Box>
                 </Paper>
@@ -1605,6 +1618,16 @@ function NuevoFolio() {
                       inputProps={{ maxLength: 99 }}
                       onChange={handleChangeSetFolio}
                       fullWidth
+                      error={
+                        folio.destino_correo !== "" &&
+                        !folio.destino_correo.includes("@")
+                      }
+                      helperText={
+                        folio.destino_correo !== "" &&
+                        !folio.destino_correo.includes("@")
+                          ? "El correo no es valido!"
+                          : ""
+                      }
                     />
                   </Box>
                 </Paper>
@@ -1799,6 +1822,7 @@ function NuevoFolio() {
                           setFolio({ ...folio, fecha_retorno: value });
                         }
                       }}
+                      onClick={(e) => e.target.showPicker?.()}
                       label="Fecha de Retorno"
                       InputLabelProps={{ shrink: true }}
                       fullWidth

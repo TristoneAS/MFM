@@ -56,19 +56,19 @@ export default function MisSolicitudes() {
 
     switch (estado) {
       case "NA":
-        icon = <BrowserNotSupportedIcon style={{ color: "#cdcdccff" }} />;
+        icon = <BrowserNotSupportedIcon sx={{ color: "#cdcdccff" }} />;
         color = "#cdcdccff";
         break;
       case "Pendiente":
-        icon = <HourglassBottomTwoToneIcon style={{ color: "#ffb74d" }} />;
+        icon = <HourglassBottomTwoToneIcon sx={{ color: "#ffb74d" }} />;
         color = "#ffb74d";
         break;
       case "Aprobado":
-        icon = <CheckCircleIcon style={{ color: "#81c784" }} />;
+        icon = <CheckCircleIcon sx={{ color: "#81c784" }} />;
         color = "#81c784";
         break;
       case "Rechazado":
-        icon = <CancelTwoToneIcon style={{ color: "#FF6A6A" }} />;
+        icon = <CancelTwoToneIcon sx={{ color: "#FF6A6A" }} />;
         color = "#FF6A6A";
         break;
       default:
@@ -81,16 +81,17 @@ export default function MisSolicitudes() {
         style={{
           display: "flex",
           alignItems: "center",
-          fontWeight: "bold",
-          color,
           justifyContent: "center",
+          width: "100%", // ocupa todo el ancho de la celda
+          height: "100%", // ocupa todo el alto de la celda
+          color,
         }}
       >
         {icon}
-        {/*   <span style={{ marginLeft: 6 }}>{estado}</span> */}
       </span>
     );
   };
+
   // ---------------- States ----------------
   const [emp_id, setEmp_id] = useState(null);
   const [rows, setRows] = useState([]);
@@ -115,6 +116,8 @@ export default function MisSolicitudes() {
       flex: 1.0,
       sortable: false,
       filterable: false,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => {
         const row = params.row;
 
@@ -136,34 +139,79 @@ export default function MisSolicitudes() {
         );
       },
     },
-    { field: "folio_id", headerName: "Folio", flex: 0.3, align: "center" },
-    { field: "fecha", headerName: "Fecha", flex: 1 },
-    { field: "creado_por", headerName: "Requisitor", flex: 2 },
-    { field: "responsable1", headerName: "Aprobador", flex: 2 },
+    {
+      field: "folio_id",
+      headerName: "Folio",
+      flex: 0.3,
+      align: "center",
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "fecha",
+      headerName: "Fecha",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "creado_por",
+      headerName: "Requisitor",
+      flex: 2,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "responsable1",
+      headerName: "Aprobador",
+      flex: 2,
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "status_1",
       headerName: "Estado",
       flex: 0.9,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => renderEstadoCell(params.value),
     },
-    { field: "suplente", headerName: "Suplente", flex: 2 },
+    {
+      field: "suplente",
+      headerName: "Suplente",
+      flex: 2,
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "status_S",
       headerName: "Estado",
       flex: 0.9,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => renderEstadoCell(params.value),
     },
-    { field: "responsable2", headerName: "Aprobador 2", flex: 2 },
+    {
+      field: "responsable2",
+      headerName: "Aprobador 2",
+      flex: 2,
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "status_2",
       headerName: "Estado",
       flex: 1,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => renderEstadoCell(params.value),
     },
     {
       field: "estado_retorno",
       headerName: "Dias Restantes",
       flex: 1.5,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => {
         const row = params.row;
         const dias = row.dias_restantes; // viene de tu consulta SQL
@@ -285,6 +333,8 @@ export default function MisSolicitudes() {
       field: "acciones",
       headerName: "Acción",
       flex: 1.0,
+      align: "center",
+      headerAlign: "center",
       sortable: false,
       filterable: false,
       renderCell: (params) => {
@@ -320,34 +370,79 @@ export default function MisSolicitudes() {
         );
       },
     },
-    { field: "folio_id", headerName: "Folio", flex: 0.3, align: "center" },
-    { field: "fecha", headerName: "Fecha", flex: 1 },
-    { field: "creado_por", headerName: "Requisitor", flex: 2 },
-    { field: "responsable1", headerName: "Aprobador", flex: 2 },
+    {
+      field: "folio_id",
+      headerName: "Folio",
+      flex: 0.3,
+      align: "center",
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "fecha",
+      headerName: "Fecha",
+      flex: 1,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "creado_por",
+      headerName: "Requisitor",
+      flex: 2,
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "responsable1",
+      headerName: "Aprobador",
+      flex: 2,
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "status_1",
       headerName: "Estado",
       flex: 0.9,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => renderEstadoCell(params.value),
     },
-    { field: "suplente", headerName: "Suplente", flex: 2 },
+    {
+      field: "suplente",
+      headerName: "Suplente",
+      flex: 2,
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "status_S",
       headerName: "Estado",
       flex: 0.9,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => renderEstadoCell(params.value),
     },
-    { field: "responsable2", headerName: "Aprobador 2", flex: 2 },
+    {
+      field: "responsable2",
+      headerName: "Aprobador 2",
+      flex: 2,
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "status_2",
       headerName: "Estado",
       flex: 1,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => renderEstadoCell(params.value),
     },
     {
       field: "estado_retorno",
       headerName: "Dias Restantes",
       flex: 1.5,
+      align: "center",
+      headerAlign: "center",
       renderCell: (params) => {
         const row = params.row;
         const dias = row.dias_restantes; // viene de tu consulta SQL
