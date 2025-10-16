@@ -1418,7 +1418,7 @@ function NuevoFolio() {
                   </Typography>
 
                   <FormControl fullWidth>
-                    <InputLabel>Origen Location</InputLabel>
+                    <InputLabel>Ubicacion origen</InputLabel>
                     <Select
                       value={locacionSelectedOrigen}
                       onChange={handleChangeLocacionOrigen}
@@ -1490,7 +1490,7 @@ function NuevoFolio() {
                     />
 
                     <TextField
-                      label="Email"
+                      label="Correo"
                       name="origen_correo"
                       variant="outlined"
                       size="small"
@@ -1537,7 +1537,7 @@ function NuevoFolio() {
                   </Typography>
 
                   <FormControl fullWidth>
-                    <InputLabel>Destino Location</InputLabel>
+                    <InputLabel>Ubicacion destino</InputLabel>
                     <Select
                       value={locacionSelected}
                       onChange={handleChangeLocacion}
@@ -1609,7 +1609,7 @@ function NuevoFolio() {
                     />
 
                     <TextField
-                      label="Email"
+                      label="Correo"
                       name="destino_correo"
                       variant="outlined"
                       size="small"
@@ -1834,7 +1834,7 @@ function NuevoFolio() {
 
                   {/* COST CENTER */}
                   <FormControl fullWidth size="small">
-                    <InputLabel>Cost Center</InputLabel>
+                    <InputLabel>Centro de costos</InputLabel>
                     <Select
                       value={costCenterSelected}
                       onChange={handleChangeCostCenter}
@@ -1854,7 +1854,7 @@ function NuevoFolio() {
                     value={costCenterName}
                     size="small"
                     variant="outlined"
-                    label="Cost Center Name"
+                    label="Nombre centro de costos"
                     fullWidth
                     disabled
                   />

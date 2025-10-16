@@ -1147,7 +1147,9 @@ function Editar({
                     </Typography>
 
                     <FormControl fullWidth size="small" variant="outlined">
-                      <InputLabel id="origen-label">Origen Location</InputLabel>
+                      <InputLabel id="origen-label">
+                        Ubicacion origen
+                      </InputLabel>
                       <Select
                         labelId="origen-label"
                         value={locacionSelectedOrigen}
@@ -1209,7 +1211,7 @@ function Editar({
                       />
 
                       <TextField
-                        label="Email"
+                        label="Correo"
                         name="origen_correo"
                         variant="outlined"
                         size="small"
@@ -1259,7 +1261,7 @@ function Editar({
 
                     <FormControl fullWidth size="small" variant="outlined">
                       <InputLabel id="destino-label">
-                        Destino Location
+                        Ubicacion destino
                       </InputLabel>
                       <Select
                         labelId="destino-label"
@@ -1322,7 +1324,7 @@ function Editar({
                       />
 
                       <TextField
-                        label="Email"
+                        label="Correo"
                         name="origen_correo"
                         variant="outlined"
                         size="small"
@@ -1555,7 +1557,9 @@ function Editar({
 
                     {/* COST CENTER */}
                     <FormControl fullWidth size="small" variant="outlined">
-                      <InputLabel id="costcenter-label">Cost Center</InputLabel>
+                      <InputLabel id="costcenter-label">
+                        Centro de costos
+                      </InputLabel>
                       <Select
                         labelId="costcenter-label"
                         value={costCenterSelected}
@@ -1576,7 +1580,7 @@ function Editar({
                       value={folio.cost_center_name}
                       size="small"
                       variant="outlined"
-                      label="Cost Center Name"
+                      label="Nombre centro de costos"
                       fullWidth
                       disabled
                     />

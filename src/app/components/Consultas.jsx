@@ -19,6 +19,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import React from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { Button } from "@mui/material";
 
 // 👇 teclado virtual
 import Keyboard from "react-simple-keyboard";
@@ -32,6 +33,7 @@ function Consultas() {
   const [rows, setRows] = useState([]);
 
   const [open, setOpen] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
@@ -99,8 +101,11 @@ function Consultas() {
       } else {
         console.log("No se encontró paquetería");
       }
-
-      setOpenVisualizar(true);
+      if (buscarFolio.data.length > 0) {
+        setOpenVisualizar(true);
+      } else {
+        setOpenModal(true);
+      }
     } catch (error) {
       console.error("Error:", error);
     }
@@ -130,18 +135,12 @@ function Consultas() {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              <img
-                src="/tristone_logo_head.png"
-                alt="Logo"
-                style={{
-                  display: "flex",
-                  width: "80px",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              />
-              <center>Consultar Folios</center>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}
+            >
+              MATERIAL FLOW MANAGER
             </Typography>
           </Toolbar>
         </AppBar>
@@ -248,6 +247,39 @@ function Consultas() {
               "{enter}": "Ok",
             }}
           />
+        </Box>
+      </Modal>
+      <Modal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        aria-labelledby="no-folio-title"
+        aria-describedby="no-folio-description"
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 360,
+            bgcolor: "background.paper",
+            borderRadius: 3,
+            boxShadow: 24,
+            p: 4,
+            textAlign: "center",
+          }}
+        >
+          <Typography
+            id="no-folio-title"
+            variant="h6"
+            component="h2"
+            sx={{ mb: 2 }}
+          >
+            No se encontró folio
+          </Typography>
+          {/* <Typography id="no-folio-description" sx={{ mb: 3 }}>
+            Verifica que el número ingresado sea correcto o intenta nuevamente.
+          </Typography> */}
         </Box>
       </Modal>
     </div>
