@@ -224,29 +224,36 @@ function Consultas() {
       >
         <Box
           sx={{
-            bgcolor: "background.paper",
-            p: 2,
-            borderRadius: 2,
-            boxShadow: 24,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 2,
+            transform: "scale(1.5)",
           }}
         >
-          <TextField value={inputValue}></TextField>
-          <Keyboard
-            onChange={handleKeyboardChange}
-            onKeyPress={handleKeyPress}
-            input={inputValue}
-            layout={{
-              default: ["1 2 3", "4 5 6", "7 8 9", "{bksp} 0 {enter}"],
+          <Box
+            sx={{
+              bgcolor: "background.paper",
+              p: 2,
+              borderRadius: 2,
+              boxShadow: 24,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 2,
+              justifyContent: "center",
             }}
-            display={{
-              "{bksp}": "⌫",
-              "{enter}": "Ok",
-            }}
-          />
+          >
+            <TextField value={inputValue}></TextField>
+            <Keyboard
+              onChange={handleKeyboardChange}
+              onKeyPress={handleKeyPress}
+              input={inputValue}
+              layout={{
+                default: ["1 2 3", "4 5 6", "7 8 9", "{bksp} 0 {enter}"],
+              }}
+              display={{
+                "{bksp}": "⌫",
+                "{enter}": "Ok",
+              }}
+            />
+          </Box>
         </Box>
       </Modal>
       <Modal

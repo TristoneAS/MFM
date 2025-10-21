@@ -12,9 +12,34 @@ import HourglassBottomTwoToneIcon from "@mui/icons-material/HourglassBottomTwoTo
 import CancelTwoToneIcon from "@mui/icons-material/CancelTwoTone";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import BrowserNotSupportedIcon from "@mui/icons-material/BrowserNotSupported";
+import { useRouter } from "next/navigation";
 
 import Visualizar from "./Visualizar";
 function VerTodos() {
+  const [admin, setAdmin] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const userInfo = localStorage.getItem("user");
+
+    if (userInfo) {
+      try {
+        const parsedUserInfo = JSON.parse(userInfo);
+        const roles = parsedUserInfo.roles;
+        for (let eachrol of roles) {
+          if (eachrol.includes("Admin")) {
+            setAdmin(true);
+            break;
+          }
+        }
+        if (!admin) {
+          router.push("/");
+        }
+      } catch (error) {
+        console.error("Error al parsear el JSON:", error);
+      }
+    }
+  }, []);
   const [rows, setRows] = useState([]);
   const [idSelected, setIdSelected] = useState(null);
   const [loading, setLoading] = useState(true);

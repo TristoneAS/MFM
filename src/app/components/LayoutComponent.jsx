@@ -193,7 +193,7 @@ export default function NavBar() {
               }}
             >
               {/*  {title} */}
-              MATERIAL FLOW MANAGER
+              SALIDA MATERIAL
             </Typography>
 
             <IconButton

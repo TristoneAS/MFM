@@ -6,6 +6,7 @@ import { Button, Typography, Card } from "@mui/material";
 import axios from "axios";
 import PropTypes from "prop-types";
 import Modal from "@mui/material/Modal";
+import { useRouter } from "next/navigation";
 
 import TextField from "@mui/material/TextField";
 import Mensaje from "./Mensaje";
@@ -53,6 +54,30 @@ function a11yProps(index) {
 }
 
 function Configuracion() {
+  const [admin, setAdmin] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const userInfo = localStorage.getItem("user");
+
+    if (userInfo) {
+      try {
+        const parsedUserInfo = JSON.parse(userInfo);
+        const roles = parsedUserInfo.roles;
+        for (let eachrol of roles) {
+          if (eachrol.includes("Admin")) {
+            setAdmin(true);
+            break;
+          }
+        }
+        if (!admin) {
+          router.push("/");
+        }
+      } catch (error) {
+        console.error("Error al parsear el JSON:", error);
+      }
+    }
+  }, []);
   const [mounted, setMounted] = useState(false);
 
   const inputRef = useRef(null);
