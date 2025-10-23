@@ -136,7 +136,7 @@ export default function Historial() {
 
   const handleClickRow = (params) => {
     setIdSelected(params.id);
-    setOcultarBoton(true);
+    setOcultarBoton(false);
   };
   const handleClickRowTemporales = (params) => {
     setIdSelected(params.id);

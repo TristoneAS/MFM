@@ -91,6 +91,8 @@ export default function NavBar() {
         for (let eachrol of roles) {
           if (eachrol.includes("Admin")) {
             setAdmin(true);
+            localStorage.setItem("admin", "true");
+
             break;
           }
         }

@@ -16,28 +16,12 @@ import { useRouter } from "next/navigation";
 
 import Visualizar from "./Visualizar";
 function VerTodos() {
-  const [admin, setAdmin] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    const userInfo = localStorage.getItem("user");
-
-    if (userInfo) {
-      try {
-        const parsedUserInfo = JSON.parse(userInfo);
-        const roles = parsedUserInfo.roles;
-        for (let eachrol of roles) {
-          if (eachrol.includes("Admin")) {
-            setAdmin(true);
-            break;
-          }
-        }
-        if (!admin) {
-          router.push("/");
-        }
-      } catch (error) {
-        console.error("Error al parsear el JSON:", error);
-      }
+    const admin = localStorage.getItem("admin");
+    if (admin !== "true") {
+      router.push("/");
     }
   }, []);
   const [rows, setRows] = useState([]);

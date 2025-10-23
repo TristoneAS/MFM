@@ -58,24 +58,9 @@ function Configuracion() {
   const router = useRouter();
 
   useEffect(() => {
-    const userInfo = localStorage.getItem("user");
-
-    if (userInfo) {
-      try {
-        const parsedUserInfo = JSON.parse(userInfo);
-        const roles = parsedUserInfo.roles;
-        for (let eachrol of roles) {
-          if (eachrol.includes("Admin")) {
-            setAdmin(true);
-            break;
-          }
-        }
-        if (!admin) {
-          router.push("/");
-        }
-      } catch (error) {
-        console.error("Error al parsear el JSON:", error);
-      }
+    const admin = localStorage.getItem("admin");
+    if (admin !== "true") {
+      router.push("/");
     }
   }, []);
   const [mounted, setMounted] = useState(false);
@@ -1779,8 +1764,8 @@ function Configuracion() {
             fontSize: "20px",
           }}
         >
-          <Box sx={{ ...style, padding: 4, borderRadius: 2 }}>
-            <Typography variant="h4" align="center" gutterBottom>
+          <Box sx={{ ...style, p: 4, borderRadius: 2 }}>
+            <Typography variant="h4" align="center" sx={{ mb: 3 }}>
               Tipo de Material
             </Typography>
 
@@ -1796,13 +1781,14 @@ function Configuracion() {
                 sx={{ maxWidth: 400 }}
               />
 
-              <FormControl fullWidth sx={{ maxWidth: 400 }}>
+              <FormControl fullWidth variant="outlined" sx={{ maxWidth: 400 }}>
                 <InputLabel id="responsable1-label">Responsable 1</InputLabel>
                 <Select
                   labelId="responsable1-label"
                   id="responsable1-select"
                   name="responsable1"
                   value={material.responsable1}
+                  label="Responsable 1"
                   onChange={handleChangeSetInfo}
                 >
                   {respons.map((r) => (
@@ -1813,13 +1799,14 @@ function Configuracion() {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth sx={{ maxWidth: 400 }}>
+              <FormControl fullWidth variant="outlined" sx={{ maxWidth: 400 }}>
                 <InputLabel id="suplente-label">Suplente</InputLabel>
                 <Select
                   labelId="suplente-label"
                   id="suplente-select"
                   name="suplente"
                   value={material.suplente}
+                  label="Suplente"
                   onChange={handleChangeSetInfo}
                 >
                   {respons.map((r) => (
@@ -1830,13 +1817,14 @@ function Configuracion() {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth sx={{ maxWidth: 400 }}>
+              <FormControl fullWidth variant="outlined" sx={{ maxWidth: 400 }}>
                 <InputLabel id="responsable2-label">Responsable 2</InputLabel>
                 <Select
                   labelId="responsable2-label"
                   id="responsable2-select"
                   name="responsable2"
                   value={material.responsable2}
+                  label="Responsable 2"
                   onChange={handleChangeSetInfo}
                 >
                   {respons.map((r) => (
@@ -2004,8 +1992,8 @@ function Configuracion() {
             fontSize: "20px",
           }}
         >
-          <Box sx={{ ...style, padding: 4, borderRadius: 2 }}>
-            <Typography variant="h4" align="center" gutterBottom>
+          <Box sx={{ ...style, p: 4, borderRadius: 2 }}>
+            <Typography variant="h4" align="center" sx={{ mb: 3 }}>
               Locación
             </Typography>
 
@@ -2033,13 +2021,14 @@ function Configuracion() {
                 sx={{ maxWidth: 400 }}
               />
 
-              <FormControl fullWidth sx={{ maxWidth: 400 }}>
+              <FormControl fullWidth variant="outlined" sx={{ maxWidth: 400 }}>
                 <InputLabel id="documento-label">Título documento</InputLabel>
                 <Select
                   labelId="documento-label"
                   id="documento-select"
                   name="documento"
                   value={locacion.documento}
+                  label="Título documento" // 👈 clave para evitar traslape
                   onChange={handleChangeSetInfoLocacion}
                 >
                   <MenuItem value="FORMATO SALIDA DE MATERIAL">
