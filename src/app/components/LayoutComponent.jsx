@@ -76,6 +76,9 @@ export default function NavBar() {
   const handleClickCerrarSesion = () => {
     localStorage.removeItem("isAuthenticated");
     localStorage.removeItem("user");
+    localStorage.removeItem("titulo");
+    localStorage.removeItem("emp_id");
+
     router.push("/");
   };
 
