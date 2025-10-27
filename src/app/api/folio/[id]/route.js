@@ -1,30 +1,11 @@
 import { NextResponse } from "next/server";
 import { conn } from "@/libs/mysql";
 
-/* export async function DELETE(request, context) {
-  try {
-    const { id } = await context.params;
-    console.log(id);
-    const result = await conn.query("DELETE from tipo_material where id=?", [
-      id,
-    ]);
-    return result.affectedRows === 0
-      ? NextResponse.json(
-          { message: "El articulo no fue encontrado" },
-          { status: 404 }
-        )
-      : new Response(null, { status: 204 });
-  } catch (error) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
-  }
-} */
 export async function PUT(request, context) {
   try {
     const { id } = await context.params;
     const body = await request.json();
     const { createdby, status, liberar, fecha_regreso, emp_id } = body;
-    console.log("Folio:", id);
-    console.log("createdby:", createdby);
 
     // Buscar el folio
     const [rows] = await conn.query("SELECT * FROM folios WHERE folio_id = ?", [
@@ -39,10 +20,6 @@ export async function PUT(request, context) {
 
     const folio = rows[0];
     let result = null;
-    console.log("El responsable 1", folio.responsable1);
-    console.log("El suplente", folio.suplente);
-    console.log("El responsable 2", folio.responsable2);
-    console.log("El creador", createdby);
 
     // Verificar y actualizar según coincidencia
     if (folio.responsable1 === createdby) {

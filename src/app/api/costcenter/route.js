@@ -3,10 +3,7 @@ import { conn } from "@/libs/mysql";
 
 export async function POST(request) {
   try {
-    console.log("si pAsa");
-
     const { cost_center, cost_center_name } = await request.json();
-    console.log("si pAsa");
 
     const resultado = await conn.query("INSERT INTO cost_center SET ?", {
       cost_center,

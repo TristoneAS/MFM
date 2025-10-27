@@ -158,8 +158,6 @@ function Configuracion() {
   }, []);
 
   const handleClickGuardarCostCenter = async () => {
-    console.log("el csto: ", costCenter);
-
     try {
       if (
         costCenter.cost_center.trim() === "" ||
@@ -192,7 +190,6 @@ function Configuracion() {
   };
 
   const handleDeleteCostCenter = async (params) => {
-    console.log("el Cost Center es: ", params);
     if (idSelectedCostCenter !== 0) {
       try {
         if (confirm(`Eliminar id ${idSelectedCostCenter}?`)) {
@@ -240,7 +237,6 @@ function Configuracion() {
 
           setBtnDeleteCostCenter(false);
           setBtnSaveCostCenter(false);
-          console.log("test ", rowsCostCenter);
         } else {
           setBtnAddCostCenter(true);
           setBtnDeleteCostCenter(true);
@@ -353,7 +349,6 @@ function Configuracion() {
   };
 
   const handleDeleteTransportista = async (params) => {
-    console.log("el transportista es: ", params);
     if (idSelected !== 0) {
       try {
         if (confirm(`Eliminar id ${idSelected}?`)) {
@@ -506,7 +501,6 @@ function Configuracion() {
   };
 
   const handleDeleteEnvio = async () => {
-    console.log("el id es: " + idSelectedEnvio);
     if (idSelectedEnvio !== 0) {
       try {
         if (confirm(`Eliminar id ${idSelectedEnvio}?`)) {

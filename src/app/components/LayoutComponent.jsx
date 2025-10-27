@@ -78,6 +78,7 @@ export default function NavBar() {
     localStorage.removeItem("user");
     localStorage.removeItem("titulo");
     localStorage.removeItem("emp_id");
+    localStorage.removeItem("admin");
 
     router.push("/");
   };
@@ -90,15 +91,16 @@ export default function NavBar() {
       try {
         const parsedUserInfo = JSON.parse(userInfo);
         const users = parsedUserInfo.data?.users;
-        const roles = parsedUserInfo.roles;
-        for (let eachrol of roles) {
-          if (eachrol.includes("Admin")) {
-            setAdmin(true);
-            localStorage.setItem("admin", "true");
+        const roles = parsedUserInfo.data?.groups[0].cn;
+        console.log("Los roles osn", roles);
 
-            break;
-          }
+        if (roles.includes("Admin")) {
+          setAdmin(true);
+          localStorage.setItem("admin", "true");
+        } else {
+          localStorage.setItem("admin", "false");
         }
+
         ///////////******************************************************************************************************************************************* */
         if (users && users.length > 0) {
           const cn = users[0].cn;

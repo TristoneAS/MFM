@@ -155,7 +155,6 @@ function Visualizar({
       setAprobado({ ap1: true, sup: true, ap2: aprobado.ap2 });
       setEspera({ ap1: false, sup: false, ap2: espera.ap2 });
       setRechazado({ ap1: false, sup: false, ap2: rechazado.ap2 });
-      console.log("Aprobado");
     }
     if (folioRows.status_2 === "Aprobado") {
       setAprobado((prev) => ({
@@ -209,7 +208,6 @@ function Visualizar({
       const emp_id = localStorage.getItem("emp_id");
 
       if (idSelected === null) {
-        console.log("Selecciona un folio");
       } else {
         await axios.put(`/api/folio/${idSelected}`, {
           createdby: emp_id,
@@ -237,7 +235,6 @@ function Visualizar({
       const emp_id = localStorage.getItem("emp_id");
 
       if (idSelected === null) {
-        console.log("Selecciona un folio");
       } else {
         await axios.put(`/api/folio/${idSelected}`, {
           createdby: emp_id,

@@ -287,7 +287,6 @@ function NuevoFolio() {
         responsable2: "",
       }));
     }
-    console.log("El nuevo folio es: ", folio);
   }, [tipo_materialSelected]);
 
   const handleChangetipo_material = (event) => {

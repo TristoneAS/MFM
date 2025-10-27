@@ -551,8 +551,6 @@ export default function MisPendientes() {
       align: "center",
       headerAlign: "center",
       renderCell: (params) => {
-        console.log("los params son: ", params);
-
         const row = params.row;
         const estado = params.value;
         const dias = row.dias_restantes; // viene de tu consulta SQL
